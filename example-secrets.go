@@ -95,3 +95,47 @@ var secretTenant = `
     "type": "Opaque"
 }
 `
+
+var secretTenantEmptyPassword = `
+{
+    "apiVersion": "v1",
+    "data": {
+        "promtail.yaml": "c2VydmVyOgogIGh0dHBfbGlzdGVuX3BvcnQ6IDkwODAKICBncnBjX2xpc3Rlbl9wb3J0OiAwCmNsaWVudDoKICB1cmw6IGh0dHA6Ly9sb2tpLW11bHRpLXRlbmFudC1wcm94eS5jby1tb25pdG9yaW5nLnN2Yy5jbHVzdGVyLmxvY2FsOjMxMDAvYXBpL3Byb20vcHVzaAogIGJhc2ljX2F1dGg6CiAgICB1c2VybmFtZTogYWxwaGEKICAgIHBhc3N3b3JkOiAKc2NyYXBlX2NvbmZpZ3M6CiAgLSBqb2JfbmFtZTogY29udGFpbmVycwogICAgc3RhdGljX2NvbmZpZ3M6CiAgICAgIC0gdGFyZ2V0czoKICAgICAgICAgIC0gbG9jYWxob3N0CiAgICAgICAgbGFiZWxzOgogICAgICAgICAgam9iOiBjb250YWluZXJzCiAgICAgICAgICBfX3BhdGhfXzogL2xva2kvbG9ncy9jb250YWluZXJzCiAgICBwaXBlbGluZV9zdGFnZXM6CiAgICAtIHJlZ2V4OgogICAgICAgIGV4cHJlc3Npb246ICdeKD9QPG5hbWVzcGFjZT4uKilcLyg/UDxwb2Q+LiopXFsoP1A8Y29udGFpbmVyPi4qKVxdOiAoP1A8Y29udGVudD4uKiknCiAgICAtIGxhYmVsczoKICAgICAgICBuYW1lc3BhY2U6CiAgICAgICAgcG9kOgogICAgICAgIGNvbnRhaW5lcjoKICAgIC0gb3V0cHV0OgogICAgICAgIHNvdXJjZTogY29udGVudAogIC0gam9iX25hbWU6IGthaWwKICAgIHN0YXRpY19jb25maWdzOgogICAgICAtIHRhcmdldHM6CiAgICAgICAgICAtIGxvY2FsaG9zdAogICAgICAgIGxhYmVsczoKICAgICAgICAgIGpvYjoga2FpbAogICAgICAgICAgX19wYXRoX186IC9sb2tpL2xvZ3Mva2FpbAogICAgcGlwZWxpbmVfc3RhZ2VzOgogICAgLSByZWdleDoKICAgICAgICBleHByZXNzaW9uOiAnXnRpbWU9Iig/UDx0aW1lPi4qKSIgbGV2ZWw9KD9QPGxldmVsPi4qKSBtc2c9Iig/UDxjb250ZW50Pi4qKSIgY21wPSg/UDxjb21wb25lbnQ+LiopJwogICAgLSBsYWJlbHM6CiAgICAgICAgdGltZToKICAgICAgICBsZXZlbDoKICAgICAgICBjb21wb25lbnQ6CiAgICAtIHRpbWVzdGFtcDoKICAgICAgICBzb3VyY2U6IHRpbWUKICAgICAgICBmb3JtYXQ6IFJGQzMzMzkKICAgIC0gb3V0cHV0OgogICAgICAgIHNvdXJjZTogY29udGVudA=="
+    },
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Secret\",\"metadata\":{\"annotations\":{},\"name\":\"team-alpha-dev-log-recolector-config\",\"namespace\":\"team-alpha-dev\"},\"stringData\":{\"promtail.yaml\":\"server:\\n  http_listen_port: 9080\\n  grpc_listen_port: 0\\nclient:\\n  url: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100/api/prom/push\\n  basic_auth:\\n    username: alpha\\n    password: alpha\\nscrape_configs:\\n  - job_name: containers\\n    static_configs:\\n      - targets:\\n          - localhost\\n        labels:\\n          job: containers\\n          __path__: /loki/logs/containers\\n    pipeline_stages:\\n    - regex:\\n        expression: '^(?P\\u003cnamespace\\u003e.*)\\\\/(?P\\u003cpod\\u003e.*)\\\\[(?P\\u003ccontainer\\u003e.*)\\\\]: (?P\\u003ccontent\\u003e.*)'\\n    - labels:\\n        namespace:\\n        pod:\\n        container:\\n    - output:\\n        source: content\\n  - job_name: kail\\n    static_configs:\\n      - targets:\\n          - localhost\\n        labels:\\n          job: kail\\n          __path__: /loki/logs/kail\\n    pipeline_stages:\\n    - regex:\\n        expression: '^time=\\\"(?P\\u003ctime\\u003e.*)\\\" level=(?P\\u003clevel\\u003e.*) msg=\\\"(?P\\u003ccontent\\u003e.*)\\\" cmp=(?P\\u003ccomponent\\u003e.*)'\\n    - labels:\\n        time:\\n        level:\\n        component:\\n    - timestamp:\\n        source: time\\n        format: RFC3339\\n    - output:\\n        source: content\\n\"}}\n"
+        },
+        "creationTimestamp": "2020-12-28T13:19:27Z",
+        "managedFields": [
+            {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:data": {
+                        ".": {},
+                        "f:promtail.yaml": {}
+                    },
+                    "f:metadata": {
+                        "f:annotations": {
+                            ".": {},
+                            "f:kubectl.kubernetes.io/last-applied-configuration": {}
+                        }
+                    },
+                    "f:type": {}
+                },
+                "manager": "kubectl-client-side-apply",
+                "operation": "Update",
+                "time": "2020-12-28T13:19:27Z"
+            }
+        ],
+        "name": "team-alpha-dev-log-recolector-config",
+        "namespace": "team-alpha-dev",
+        "resourceVersion": "63853",
+        "selfLink": "/api/v1/namespaces/team-alpha-dev/secrets/team-alpha-dev-log-recolector-config",
+        "uid": "d6ca05ba-c265-4cb8-a23b-7a3b32453f72"
+    },
+    "type": "Opaque"
+}
+`
