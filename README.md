@@ -1,2 +1,2 @@
 # k8s-credsync
-synchronise credentials
+synchronise tenant and authentication proxy secrets 
