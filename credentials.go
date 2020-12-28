@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"encoding/base64"
 	"log"
+	"math/rand"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -82,4 +84,19 @@ func getEncodedSecret(json, partial string) (string, error) {
 	str = strings.ReplaceAll(str, " ", "")
 
 	return str, err
+}
+
+func passwordGenerator() string {
+	var str string
+	rand.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+		"abcdefghijklmnopqrstuvwxyz" +
+		"0123456789")
+	length := 12
+	var b strings.Builder
+	for i := 0; i < length; i++ {
+		b.WriteRune(chars[rand.Intn(len(chars))])
+	}
+	str = b.String()
+	return str
 }

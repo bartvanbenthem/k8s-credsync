@@ -40,4 +40,9 @@ func main() {
 	fmt.Printf("username:%v password:%v\n",
 		tenantcred.Client.BasicAuth.Username,
 		tenantcred.Client.BasicAuth.Password)
+
+	//test password gen
+	pw := passwordGenerator()
+	fmt.Println(pw)
+
 }
