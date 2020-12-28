@@ -16,7 +16,6 @@ type Credential struct {
 }
 
 func main() {
-
 	t, err := getTenantCredentials(secretTenant)
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -45,26 +44,15 @@ func getTenantCredentials(secretTenant string) (Credential, error) {
 		return a, err
 	}
 
-	// unmarshall the namespace value into Credential type
+	// unmarshall the namespace value into Credential type from m
 	ns, err := yaml.Marshal(m["metadata"])
 	err = yaml.Unmarshal([]byte(ns), &a)
 	if err != nil {
 		return a, err
 	}
 
-	// Marshall the stringData from the secret into byte slice
-	sd, err := yaml.Marshal(m["stringData"])
-	if err != nil {
-		return a, err
-	}
-
-	// Scan all the lines in sd byte slice
-	// append every line to the lines slice of string
-	var lines []string
-	scanner := bufio.NewScanner(strings.NewReader(string(sd)))
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
+	// get String data in slice of string from m
+	lines, err := getStringDataFromSecret(m)
 	if err != nil {
 		return a, err
 	}
@@ -82,6 +70,30 @@ func getTenantCredentials(secretTenant string) (Credential, error) {
 	}
 
 	return a, err
+}
+
+func getStringDataFromSecret(secret map[interface{}]interface{}) ([]string, error) {
+	var err error
+	var lines []string
+
+	// Marshall the stringData from the secret into byte slice
+	sd, err := yaml.Marshal(secret["stringData"])
+	if err != nil {
+		return lines, err
+	}
+
+	// Scan all the lines in sd byte slice
+	// append every line to the lines slice of string
+	scanner := bufio.NewScanner(strings.NewReader(string(sd)))
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	if err != nil {
+		return lines, err
+	}
+
+	return lines, err
+
 }
 
 // KUBERNETES TEST SECRETS
