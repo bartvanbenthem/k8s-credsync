@@ -9,4 +9,4 @@
 export K8S_KUBECONFIG='/var/snap/microk8s/current/credentials/client.config'
 export K8S_PROXY_SECRET_NAME='loki-multi-tenant-proxy-auth-config'
 export K8S_PROXY_SECRET_NAMESPACE='co-monitoring'
-export K8S_TENANT_SECRET_NAME='team-alpha-dev-log-recolector-config'
+export K8S_TENANT_SECRET_NAME='log-recolector-config'

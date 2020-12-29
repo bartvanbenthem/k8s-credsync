@@ -2,49 +2,42 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
+
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
 	//TestCredentialFunctions()
 	//TestKubeFunctions()
+	//TestMainFunctions()
 
+	updateTenantPassword("team-beta-test")
+
+}
+
+func updateTenantPassword(namespace string) {
 	// import required environment variables
-	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
-	proxyns := os.Getenv("K8S_PROXY_SECRET_NAMESPACE")
 	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
-
-	// initiate kubeclient
 	var kube KubeCLient
-
-	// get the proxy credentials
-	proxycred, err := GetProxyCredentials(string(kube.GetSecretData(kube.CreateClientSet(),
-		proxyns, proxysec, "authn.yaml")))
+	// create and set password in the tenant credential when password is empty
+	cred, err := GetTenantCredential(string(kube.GetSecretData(kube.CreateClientSet(),
+		namespace, tenantsec, "promtail.yaml")))
 	if err != nil {
-		log.Printf("\nError: %v\n", err)
+		fmt.Printf("\n%v\n", err)
 	}
-	for _, p := range proxycred.Users {
-		fmt.Printf("\nUser:%v Password:%v org:%v\n",
-			p.Username, p.Password, p.Orgid)
-	}
-
-	// get the credentials from all tenants
-	var tenantcred []TenantCredential
-	namespaces := kube.GetAllNamespaces(kube.CreateClientSet())
-	for _, ns := range namespaces {
-		cred, err := GetTenantCredential(string(kube.GetSecretData(kube.CreateClientSet(),
-			ns, tenantsec, "promtail.yaml")))
-		if err != nil {
-			fmt.Printf("\n%v\n", err)
-		}
-		if len(cred.Client.BasicAuth.Username) != 0 {
-			tenantcred = append(tenantcred, cred)
-		}
+	if len(cred.Client.BasicAuth.Username) != 0 {
+		PasswordSetter(&cred)
 	}
 
-	for _, t := range tenantcred {
-		fmt.Printf("\nUser:%v Password:%v\n",
-			t.Client.BasicAuth.Username, t.Client.BasicAuth.Password)
+	credbyte, err := yaml.Marshal(&cred)
+	if err != nil {
+		fmt.Printf("\nerror encoding yaml: %v\n", err)
 	}
+
+	sec := kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
+	sec.Data["promtail.yaml"] = credbyte
+
+	updatedsec := kube.UpdateSecret(kube.CreateClientSet(), namespace, sec)
+	fmt.Printf("\n%v\n", string(updatedsec.Data["promtail.yaml"]))
 }

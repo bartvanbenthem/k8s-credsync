@@ -39,10 +39,7 @@ func TestCredentialFunctions() {
 	// test by printing tenant struct values
 	// when password is an empty string generate password
 	fmt.Printf("\ntenant\n------\n")
-	p := tenantcred.Client.BasicAuth.Password
-	if p == "" || p == " " {
-		tenantcred.Client.BasicAuth.Password = PasswordGenerator()
-	}
+	PasswordSetter(&tenantcred)
 	fmt.Printf("username:%v password:%v\n",
 		tenantcred.Client.BasicAuth.Username,
 		tenantcred.Client.BasicAuth.Password)

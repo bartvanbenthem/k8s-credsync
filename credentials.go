@@ -20,6 +20,10 @@ type ProxyCredentials struct {
 }
 
 type TenantCredential struct {
+	Server struct {
+		HTTPListenPort int `yaml:"http_listen_port"`
+		GrpcListenPort int `yaml:"grpc_listen_port"`
+	} `yaml:"server"`
 	Client struct {
 		URL       string `yaml:"url"`
 		BasicAuth struct {
@@ -27,6 +31,29 @@ type TenantCredential struct {
 			Password string `yaml:"password"`
 		} `yaml:"basic_auth"`
 	} `yaml:"client"`
+	ScrapeConfigs []struct {
+		JobName       string `yaml:"job_name"`
+		StaticConfigs []struct {
+			Targets []string `yaml:"targets"`
+			Labels  struct {
+				Job  string `yaml:"job"`
+				Path string `yaml:"__path__"`
+			} `yaml:"labels"`
+		} `yaml:"static_configs"`
+		PipelineStages []struct {
+			Regex struct {
+				Expression string `yaml:"expression"`
+			} `yaml:"regex,omitempty"`
+			Labels struct {
+				Namespace interface{} `yaml:"namespace"`
+				Pod       interface{} `yaml:"pod"`
+				Container interface{} `yaml:"container"`
+			} `yaml:"labels,omitempty"`
+			Output struct {
+				Source string `yaml:"source"`
+			} `yaml:"output,omitempty"`
+		} `yaml:"pipeline_stages"`
+	} `yaml:"scrape_configs"`
 }
 
 // input is a decoded yaml config file from the secret
@@ -53,6 +80,13 @@ func GetTenantCredential(file string) (TenantCredential, error) {
 	return c, err
 }
 
+func PasswordSetter(t *TenantCredential) *TenantCredential {
+	if len(t.Client.BasicAuth.Password) == 0 {
+		t.Client.BasicAuth.Password = PasswordGenerator()
+	}
+	return t
+}
+
 func PasswordGenerator() string {
 	var str string
 	rand.Seed(time.Now().UnixNano())
@@ -67,6 +101,10 @@ func PasswordGenerator() string {
 	str = b.String()
 	return str
 }
+
+/////////////////////////////////////////////////////////////
+// ONLY USED FOR RAW JSON RESPONSE FROM THE KUBERNETES API
+/////////////////////////////////////////////////////////////
 
 func DecodeSecret(encoded string) string {
 	decoded, err := base64.StdEncoding.DecodeString(encoded)

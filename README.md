@@ -19,3 +19,4 @@ generate and synchronise basic auth credentials for all tenants with the authent
 ### technical choices
 * go-client sdk is used to interract with the kubernetes API
 * a kubernetes service account is used to athenticate and authorize the credsync service
+* proxy service needs to be restarted after config update

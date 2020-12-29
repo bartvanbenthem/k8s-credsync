@@ -7,7 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -41,8 +42,26 @@ func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 	return clientset
 }
 
-func (k *KubeCLient) GetSecretData(clientset *kubernetes.Clientset, namespace, secretname, datafield string) []byte {
-	sec, err := clientset.CoreV1().Secrets(namespace).Get(context.TODO(), secretname, v1.GetOptions{})
+func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
+	sec, err := c.CoreV1().Secrets(namespace).Update(context.TODO(), secret, metav1.UpdateOptions{})
+	if err != nil {
+		fmt.Printf("\nUnable to retreive secret data field from: %v\n", namespace)
+		fmt.Printf("%v\n", err)
+	}
+	return sec
+}
+
+func (k *KubeCLient) GetSecret(c *kubernetes.Clientset, namespace, secretname string) *v1.Secret {
+	sec, err := c.CoreV1().Secrets(namespace).Get(context.TODO(), secretname, metav1.GetOptions{})
+	if err != nil {
+		fmt.Printf("\nUnable to retreive secret data field from: %v\n", namespace)
+		fmt.Printf("%v\n", err)
+	}
+	return sec
+}
+
+func (k *KubeCLient) GetSecretData(c *kubernetes.Clientset, namespace, secretname, datafield string) []byte {
+	sec, err := c.CoreV1().Secrets(namespace).Get(context.TODO(), secretname, metav1.GetOptions{})
 	if err != nil {
 		fmt.Printf("\nUnable to retreive secret data field from: %v\n", namespace)
 		fmt.Printf("%v\n", err)
@@ -50,9 +69,9 @@ func (k *KubeCLient) GetSecretData(clientset *kubernetes.Clientset, namespace, s
 	return sec.Data[datafield]
 }
 
-func (k *KubeCLient) GetAllNamespaces(clientset *kubernetes.Clientset) []string {
+func (k *KubeCLient) GetAllNamespaces(c *kubernetes.Clientset) []string {
 	var namespaces []string
-	ns, err := clientset.CoreV1().Namespaces().List(context.TODO(), v1.ListOptions{})
+	ns, err := c.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Printf("\nError listing namespaces: %v\n", err)
 	}
