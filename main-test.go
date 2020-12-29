@@ -15,6 +15,13 @@ func TestMainFunctions() {
 	// initiate kubeclient
 	var kube KubeCLient
 
+	// get proxy secret data
+	fmt.Printf("\n%v\n", string(kube.GetSecretData(kube.CreateClientSet(),
+		proxyns, proxysec, "authn.yaml")))
+	// get tenant secret data
+	fmt.Printf("\n%v\n", string(kube.GetSecretData(kube.CreateClientSet(),
+		"team-alpha-dev", tenantsec, "promtail.yaml")))
+
 	// get the proxy credentials
 	proxycred, err := GetProxyCredentials(string(kube.GetSecretData(kube.CreateClientSet(),
 		proxyns, proxysec, "authn.yaml")))

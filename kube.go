@@ -42,6 +42,8 @@ func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 	return clientset
 }
 
+func (k *KubeCLient) RestartPod(c *kubernetes.Clientset, namespace, podname string) {}
+
 func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
 	sec, err := c.CoreV1().Secrets(namespace).Update(context.TODO(), secret, metav1.UpdateOptions{})
 	if err != nil {

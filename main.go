@@ -12,10 +12,26 @@ func main() {
 	//TestKubeFunctions()
 	//TestMainFunctions()
 
-	updateTenantPassword("team-beta-test")
+	// initiate kube client
+	var kube KubeCLient
 
+	// import environment variables
+	//proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
+	//proxyns := os.Getenv("K8S_PROXY_SECRET_NAMESPACE")
+	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
+
+	namespaces := kube.GetAllNamespaces(kube.CreateClientSet())
+	for _, ns := range namespaces {
+		s := kube.GetSecretData(kube.CreateClientSet(),
+			ns, tenantsec, "promtail.yaml")
+		if len(s) != 0 {
+			updateTenantPassword(ns)
+		}
+	}
 }
 
+// scan the tenant credentials
+// create and update password when empty
 func updateTenantPassword(namespace string) {
 	// import required environment variables
 	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
