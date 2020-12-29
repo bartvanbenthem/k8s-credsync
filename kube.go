@@ -43,7 +43,10 @@ func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 	return clientset
 }
 
-func (k *KubeCLient) getAllNamespaces(clientset *kubernetes.Clientset) {
-	pods, _ := clientset.CoreV1().Pods("").List(context.TODO(), v1.ListOptions{})
-	fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+func (k *KubeCLient) countNamespaces(clientset *kubernetes.Clientset) {
+	ns, err := clientset.CoreV1().Namespaces().List(context.TODO(), v1.ListOptions{})
+	if err != nil {
+		log.Printf("\nError getting ns: %v", err)
+	}
+	fmt.Printf("\nThere are %d namespaces in the cluster\n", len(ns.Items))
 }

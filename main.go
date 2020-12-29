@@ -46,4 +46,7 @@ func main() {
 	fmt.Printf("username:%v password:%v\n",
 		tenantcred.Client.BasicAuth.Username,
 		tenantcred.Client.BasicAuth.Password)
+
+	var kube KubeCLient
+	kube.countNamespaces(kube.CreateClientSet())
 }
