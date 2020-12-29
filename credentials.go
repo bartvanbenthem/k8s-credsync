@@ -29,6 +29,7 @@ type TenantCredential struct {
 	} `yaml:"client"`
 }
 
+// input is a decoded yaml config file from the secret
 func getProxyCredentials(file string) (ProxyCredentials, error) {
 	var err error
 	var c ProxyCredentials
@@ -40,6 +41,7 @@ func getProxyCredentials(file string) (ProxyCredentials, error) {
 	return c, err
 }
 
+// input is a decoded yaml config file from the secret
 func getTenantCredential(file string) (TenantCredential, error) {
 	var err error
 	var c TenantCredential
@@ -59,6 +61,7 @@ func decodeSecret(encoded string) string {
 	return string(decoded)
 }
 
+// extract the encoded secret from the k8s json response
 func getEncodedSecret(json, partial string) (string, error) {
 	var err error
 	var lines []string
