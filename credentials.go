@@ -30,7 +30,7 @@ type TenantCredential struct {
 }
 
 // input is a decoded yaml config file from the secret
-func getProxyCredentials(file string) (ProxyCredentials, error) {
+func GetProxyCredentials(file string) (ProxyCredentials, error) {
 	var err error
 	var c ProxyCredentials
 	// unmarshall entire tenant JSON into a map
@@ -42,7 +42,7 @@ func getProxyCredentials(file string) (ProxyCredentials, error) {
 }
 
 // input is a decoded yaml config file from the secret
-func getTenantCredential(file string) (TenantCredential, error) {
+func GetTenantCredential(file string) (TenantCredential, error) {
 	var err error
 	var c TenantCredential
 	// unmarshall entire tenant JSON into a map
@@ -53,7 +53,7 @@ func getTenantCredential(file string) (TenantCredential, error) {
 	return c, err
 }
 
-func passwordGenerator() string {
+func PasswordGenerator() string {
 	var str string
 	rand.Seed(time.Now().UnixNano())
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -68,7 +68,7 @@ func passwordGenerator() string {
 	return str
 }
 
-func decodeSecret(encoded string) string {
+func DecodeSecret(encoded string) string {
 	decoded, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
 		log.Fatalf("Error decoding: %v", err)
@@ -77,7 +77,7 @@ func decodeSecret(encoded string) string {
 }
 
 // extract the encoded secret from the k8s json response
-func getEncodedSecret(jsonresponse, partial string) (string, error) {
+func GetEncodedSecret(jsonresponse, partial string) (string, error) {
 	var err error
 	var lines []string
 	// Scan all the lines in sd byte slice

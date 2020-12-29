@@ -7,12 +7,12 @@ import (
 
 func TestCredentialFunctions() {
 	// get base64 encoded proxy secret
-	proxy, err := getEncodedSecret(secretProxy, "\"authn.yaml\":")
+	proxy, err := GetEncodedSecret(secretProxy, "\"authn.yaml\":")
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 	// get base64 encoded tenant secret
-	tenant, err := getEncodedSecret(secretTenantEmptyPassword, "\"promtail.yaml\":")
+	tenant, err := GetEncodedSecret(secretTenantEmptyPassword, "\"promtail.yaml\":")
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -20,12 +20,12 @@ func TestCredentialFunctions() {
 	//fmt.Printf("\nproxy\n-----\n%v\n", decodeSecret(proxy))
 	//fmt.Printf("\ntenant\n------\n%v\n", decodeSecret(tenant))
 
-	proxycred, err := getProxyCredentials(decodeSecret(proxy))
+	proxycred, err := GetProxyCredentials(DecodeSecret(proxy))
 	if err != nil {
 		log.Printf("error: %v", err)
 	}
 
-	tenantcred, err := getTenantCredential(decodeSecret(tenant))
+	tenantcred, err := GetTenantCredential(DecodeSecret(tenant))
 	if err != nil {
 		log.Printf("error: %v", err)
 	}
@@ -41,7 +41,7 @@ func TestCredentialFunctions() {
 	fmt.Printf("\ntenant\n------\n")
 	p := tenantcred.Client.BasicAuth.Password
 	if p == "" || p == " " {
-		tenantcred.Client.BasicAuth.Password = passwordGenerator()
+		tenantcred.Client.BasicAuth.Password = PasswordGenerator()
 	}
 	fmt.Printf("username:%v password:%v\n",
 		tenantcred.Client.BasicAuth.Username,

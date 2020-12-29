@@ -5,10 +5,11 @@ import "fmt"
 func TestKubeFunctions() {
 	var kube KubeCLient
 
-	fmt.Printf("\n%v\n", string(kube.getTenantSecret(kube.CreateClientSet(),
-		"team-alpha-dev", "team-alpha-dev-log-recolector-config")))
-
-	fmt.Printf("\n%v\n", string(kube.getTenantSecret(kube.CreateClientSet(),
-		"team-alpha-dev", "team-alpha-dev-log-recolector-config")))
+	// get proxy secret data
+	fmt.Printf("\n%v\n", string(kube.GetSecretData(kube.CreateClientSet(),
+		"co-monitoring", "loki-multi-tenant-proxy-auth-config", "authn.yaml")))
+	// get tenant secret data
+	fmt.Printf("\n%v\n", string(kube.GetSecretData(kube.CreateClientSet(),
+		"team-alpha-dev", "team-alpha-dev-log-recolector-config", "promtail.yaml")))
 
 }
