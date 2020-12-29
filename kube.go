@@ -33,14 +33,36 @@ func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 			os.Exit(1)
 		}
 	}
-
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 	}
-
 	return clientset
+}
+
+func (k *KubeCLient) getProxySecret(clientset *kubernetes.Clientset, namespace, secret string) {
+
+}
+
+func (k *KubeCLient) getTenantSecret(clientset *kubernetes.Clientset, namespace, secret string) []byte {
+	sec, err := clientset.CoreV1().Secrets(namespace).Get(context.TODO(), secret, v1.GetOptions{})
+	if err != nil {
+		log.Printf("\nError getting secret: %v", err)
+	}
+	return sec.Data["promtail.yaml"]
+}
+
+func (k *KubeCLient) getAllNamespaces(clientset *kubernetes.Clientset) []string {
+	var namespaces []string
+	ns, err := clientset.CoreV1().Namespaces().List(context.TODO(), v1.ListOptions{})
+	if err != nil {
+		log.Printf("\nError listing namespaces: %v", err)
+	}
+	for _, n := range ns.Items {
+		namespaces = append(namespaces, n.Name)
+	}
+	return namespaces
 }
 
 func (k *KubeCLient) countNamespaces(clientset *kubernetes.Clientset) {

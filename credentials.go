@@ -53,6 +53,21 @@ func getTenantCredential(file string) (TenantCredential, error) {
 	return c, err
 }
 
+func passwordGenerator() string {
+	var str string
+	rand.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+		"abcdefghijklmnopqrstuvwxyz" +
+		"0123456789")
+	length := 12
+	var b strings.Builder
+	for i := 0; i < length; i++ {
+		b.WriteRune(chars[rand.Intn(len(chars))])
+	}
+	str = b.String()
+	return str
+}
+
 func decodeSecret(encoded string) string {
 	decoded, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
@@ -62,12 +77,12 @@ func decodeSecret(encoded string) string {
 }
 
 // extract the encoded secret from the k8s json response
-func getEncodedSecret(json, partial string) (string, error) {
+func getEncodedSecret(jsonresponse, partial string) (string, error) {
 	var err error
 	var lines []string
 	// Scan all the lines in sd byte slice
 	// append every line to the lines slice of string
-	scanner := bufio.NewScanner(strings.NewReader(json))
+	scanner := bufio.NewScanner(strings.NewReader(jsonresponse))
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
@@ -87,19 +102,4 @@ func getEncodedSecret(json, partial string) (string, error) {
 	str = strings.ReplaceAll(str, " ", "")
 
 	return str, err
-}
-
-func passwordGenerator() string {
-	var str string
-	rand.Seed(time.Now().UnixNano())
-	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-		"abcdefghijklmnopqrstuvwxyz" +
-		"0123456789")
-	length := 12
-	var b strings.Builder
-	for i := 0; i < length; i++ {
-		b.WriteRune(chars[rand.Intn(len(chars))])
-	}
-	str = b.String()
-	return str
 }
