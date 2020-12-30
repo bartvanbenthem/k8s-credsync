@@ -42,10 +42,15 @@ func main() {
 	// update proxy kubernetes secret
 	UpdateProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		"authn.yaml", pcreds)
-
 	// restart proxy
 	RestartProxy()
 	fmt.Printf("\nCredentials are synced and proxy has been restarted\n")
+
+	// generate new log-relocator token in tenant namespaces
+	// !!!TODO
+
+	// restart log-relocator pod in tenant namespaces
+	// !!!TODO
 
 	// test by getting the credentials from the current proxy and tenant secrets
 	TestMainFunctions()
@@ -59,6 +64,8 @@ func Contains(source []string, value string) bool {
 	}
 	return false
 }
+
+func NewToken() {}
 
 func RestartProxy() {
 	// initiate kube client
