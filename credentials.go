@@ -84,13 +84,13 @@ func GetTenantCredential(file string) (TenantCredential, error) {
 
 // scan the tenant credentials
 // create and update password when empty
-func updateTenantPassword(namespace string) {
+func updateTenantSecret(namespace, datafield string) {
 	// import required environment variables
 	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
 	var kube KubeCLient
 	// create and set password in the tenant credential when password is empty
 	cred, err := GetTenantCredential(string(kube.GetSecretData(kube.CreateClientSet(),
-		namespace, tenantsec, "promtail.yaml")))
+		namespace, tenantsec, datafield)))
 	if err != nil {
 		fmt.Printf("\n%v\n", err)
 	}
@@ -104,10 +104,10 @@ func updateTenantPassword(namespace string) {
 	}
 
 	sec := kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
-	sec.Data["promtail.yaml"] = credbyte
+	sec.Data[datafield] = credbyte
 
 	updatedsec := kube.UpdateSecret(kube.CreateClientSet(), namespace, sec)
-	fmt.Printf("\n%v\n", string(updatedsec.Data["promtail.yaml"]))
+	fmt.Printf("\n%v\n", string(updatedsec.Data[datafield]))
 }
 
 func PasswordSetter(t *TenantCredential) *TenantCredential {
