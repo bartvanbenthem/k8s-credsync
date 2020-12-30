@@ -46,10 +46,10 @@ func main() {
 	RestartProxy()
 	fmt.Printf("\nCredentials are synced and proxy has been restarted\n")
 
-	// generate new log-relocator token in tenant namespaces
+	// generate new log-recolector token in tenant namespaces
 	// !!!TODO
 
-	// restart log-relocator pod in tenant namespaces
+	// restart log-recolector pod in tenant namespaces
 	// !!!TODO
 
 	// test by getting the credentials from the current proxy and tenant secrets
@@ -67,7 +67,7 @@ func Contains(source []string, value string) bool {
 
 func NewToken() {}
 
-func RestartLogRelocator() {}
+func RestartLogRecolector() {}
 
 func RestartProxy() {
 	// initiate kube client
