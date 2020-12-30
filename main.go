@@ -22,6 +22,7 @@ func main() {
 	}
 
 	// Test credential functions
+	////////////////////////////////////////////////
 	fmt.Printf("\nTenant\n------\n")
 	for _, tc := range tcreds {
 		fmt.Printf("User:%v Password:%v\n",
@@ -34,6 +35,8 @@ func main() {
 		fmt.Printf("User:%v Password:%v org:%v\n",
 			p.Username, p.Password, p.Orgid)
 	}
+	////////////////////////////////////////////////
+
 }
 
 // collects all proxy credentials
