@@ -39,8 +39,11 @@ func main() {
 	}
 
 	// update proxy kubernetes secret
+	UpdateProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
+		"authn.yaml", pcreds)
 
-	// restart proxy container
+	// restart proxy pod by deleting pod
+	// the replicaset will create a new pod with updated config
 
 	// TEST FUNCTIONS WITH PRINTING OUTPUT
 	////////////////////////////////////////////////

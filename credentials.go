@@ -88,7 +88,21 @@ func GetTenantCredential(file string) (TenantCredential, error) {
 	return c, err
 }
 
-func UpdateProxySecret() {}
+func UpdateProxySecret(namespace, datafield string, newc ProxyCredentials) {
+	// import required environment variables
+	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
+	var kube KubeCLient
+
+	credbyte, err := yaml.Marshal(&newc)
+	if err != nil {
+		fmt.Printf("\nerror encoding yaml: %v\n", err)
+	}
+
+	sec := kube.GetSecret(kube.CreateClientSet(), namespace, proxysec)
+	sec.Data[datafield] = credbyte
+	// update secret ignore output validation is in main
+	_ = kube.UpdateSecret(kube.CreateClientSet(), namespace, sec)
+}
 
 // scan the tenant credentials
 // create and update password when empty
