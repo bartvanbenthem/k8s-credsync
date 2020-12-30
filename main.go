@@ -47,19 +47,20 @@ func main() {
 
 	// TEST FUNCTIONS WITH PRINTING OUTPUT
 	////////////////////////////////////////////////
+	tcurrent, err := AllTenantCredentials()
 	fmt.Printf("\nTenant\n------\n")
-	for _, tc := range tcreds {
+	for _, tc := range tcurrent {
 		fmt.Printf("User:%v Password:%v\n",
 			tc.Client.BasicAuth.Username,
 			tc.Client.BasicAuth.Password)
 	}
 
-	current, err := AllProxyCredentials()
+	pcurrent, err := AllProxyCredentials()
 	if err != nil {
 		log.Printf("\n%v\n")
 	}
 	fmt.Printf("\nProxy\n-----\n")
-	for _, pc := range current.Users {
+	for _, pc := range pcurrent.Users {
 		fmt.Printf("User:%v Password:%v org:%v\n",
 			pc.Username, pc.Password, pc.Orgid)
 	}
