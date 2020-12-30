@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -43,29 +42,11 @@ func main() {
 		"authn.yaml", pcreds)
 
 	// restart proxy pod by deleting pod
+
 	// the replicaset will create a new pod with updated config
 
-	// TEST FUNCTIONS WITH PRINTING OUTPUT
-	////////////////////////////////////////////////
-	tcurrent, err := AllTenantCredentials()
-	fmt.Printf("\nTenant\n------\n")
-	for _, tc := range tcurrent {
-		fmt.Printf("User:%v Password:%v\n",
-			tc.Client.BasicAuth.Username,
-			tc.Client.BasicAuth.Password)
-	}
-
-	pcurrent, err := AllProxyCredentials()
-	if err != nil {
-		log.Printf("\n%v\n")
-	}
-	fmt.Printf("\nProxy\n-----\n")
-	for _, pc := range pcurrent.Users {
-		fmt.Printf("User:%v Password:%v org:%v\n",
-			pc.Username, pc.Password, pc.Orgid)
-	}
-	////////////////////////////////////////////////
-
+	// test current proxy and tenant secrets
+	TestMainFunctions()
 }
 
 func Contains(source []string, value string) bool {
@@ -87,8 +68,9 @@ func AllProxyCredentials() (ProxyCredentials, error) {
 	var kube KubeCLient
 
 	// get the proxy credentials
-	proxycred, err := GetProxyCredentials(string(kube.GetSecretData(kube.CreateClientSet(),
-		proxyns, proxysec, "authn.yaml")))
+	proxycred, err := GetProxyCredentials(string(
+		kube.GetSecretData(kube.CreateClientSet(),
+			proxyns, proxysec, "authn.yaml")))
 	if err != nil {
 		return proxycred, err
 	}
