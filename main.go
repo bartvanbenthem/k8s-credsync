@@ -67,6 +67,8 @@ func Contains(source []string, value string) bool {
 
 func NewToken() {}
 
+func RestartLogRelocator() {}
+
 func RestartProxy() {
 	// initiate kube client
 	var kube KubeCLient
