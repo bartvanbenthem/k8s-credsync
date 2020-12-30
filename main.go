@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -41,12 +43,12 @@ func main() {
 	UpdateProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		"authn.yaml", pcreds)
 
-	// restart proxy pod by deleting pod
+	// restart proxy
+	RestartProxy()
 
-	// the replicaset will create a new pod with updated config
-
-	// test current proxy and tenant secrets
-	TestMainFunctions()
+	fmt.Printf("\nCredentials are synced and proxy has been restarted\n")
+	// test by getting the credentials from the current proxy and tenant secrets
+	//TestMainFunctions()
 }
 
 func Contains(source []string, value string) bool {
@@ -56,6 +58,21 @@ func Contains(source []string, value string) bool {
 		}
 	}
 	return false
+}
+
+func RestartProxy() {
+	// initiate kube client
+	var kube KubeCLient
+	// restart proxy pod by deleting pod
+	// the replicaset will create a new pod with updated config
+	pods := kube.GetAllPods(kube.CreateClientSet(),
+		os.Getenv("K8S_PROXY_SECRET_NAMESPACE"))
+	for _, p := range pods {
+		if strings.Contains(p, os.Getenv("K8S_TENANT_POD_NAME")) {
+			kube.DeletePod(kube.CreateClientSet(),
+				os.Getenv("K8S_PROXY_SECRET_NAMESPACE"), p)
+		}
+	}
 }
 
 // collects all proxy credentials

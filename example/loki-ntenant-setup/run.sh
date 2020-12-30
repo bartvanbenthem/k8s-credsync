@@ -11,10 +11,12 @@ kubectl apply -f .
 # install Grafana helmchart
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
-helm upgrade --install loki --namespace=co-monitoring grafana/loki
+helm install grafana --namespace=co-monitoring grafana/grafana
+# grafana password
+kubectl get secret --namespace co-monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 
 # expose grafana to localhost run in seperate terminal
-kubectl port-forward svc/grafana -n co-monitoring 3000:3000
+kubectl port-forward svc/grafana -n co-monitoring 3000:80
 
 # datasource url
 http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100

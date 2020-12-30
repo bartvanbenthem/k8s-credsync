@@ -81,6 +81,22 @@ func (k *KubeCLient) GetAllNamespaces(c *kubernetes.Clientset) []string {
 	return namespaces
 }
 
-func (k *KubeCLient) GetAllPods(c *kubernetes.Clientset, namespace string) {}
+func (k *KubeCLient) GetAllPods(c *kubernetes.Clientset, namespace string) []string {
+	var pods []string
+	ns, err := c.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		log.Printf("\nError listing namespaces: %v\n", err)
+	}
+	for _, p := range ns.Items {
+		pods = append(pods, p.Name)
+	}
+	return pods
+}
 
-func (k *KubeCLient) RestartPod(c *kubernetes.Clientset, namespace, podname string) {}
+func (k *KubeCLient) DeletePod(c *kubernetes.Clientset, namespace, podname string) {
+	err := c.CoreV1().Pods(namespace).Delete(context.TODO(), podname, metav1.DeleteOptions{})
+	if err != nil {
+		log.Printf("\nError Deleting pod: %v\n", err)
+	}
+	log.Printf("\nDeleted: %v\n", podname)
+}

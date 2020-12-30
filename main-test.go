@@ -26,7 +26,6 @@ func TestMainFunctions() {
 		fmt.Printf("User:%v Password:%v org:%v\n",
 			pc.Username, pc.Password, pc.Orgid)
 	}
-
 }
 
 func TestCredentialFunctions() {
