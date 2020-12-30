@@ -8,7 +8,6 @@ import (
 
 func main() {
 	//TestCredentialFunctions()
-	//TestKubeFunctions()
 	//TestMainFunctions()
 
 	// Update and collect all tenant credentials
@@ -16,11 +15,18 @@ func main() {
 	if err != nil {
 		log.Printf("\n%v\n")
 	}
-	fmt.Printf("\n%v\n", len(tcreds))
 
 	pcreds, err := AllProxyCredentials()
 	if err != nil {
 		log.Printf("\n%v\n")
+	}
+
+	// Test credential functions
+	fmt.Printf("\nTenant\n------\n")
+	for _, tc := range tcreds {
+		fmt.Printf("User:%v Password:%v\n",
+			tc.Client.BasicAuth.Username,
+			tc.Client.BasicAuth.Password)
 	}
 
 	fmt.Printf("\nProxy\n-----\n")
@@ -64,7 +70,7 @@ func AllTenantCredentials() ([]TenantCredential, error) {
 		s := kube.GetSecretData(kube.CreateClientSet(),
 			ns, tenantsec, "promtail.yaml")
 		if len(s) != 0 {
-			updateTenantSecret(ns, "promtail.yaml")
+			UpdateTenantSecret(ns, "promtail.yaml")
 			// get updated tenant credential
 			// append updated credentials to slice of tenant credential
 			upd, err := GetTenantCredential(string(kube.GetSecretData(

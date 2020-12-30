@@ -82,9 +82,11 @@ func GetTenantCredential(file string) (TenantCredential, error) {
 	return c, err
 }
 
+func UpdateProxySecret() {}
+
 // scan the tenant credentials
 // create and update password when empty
-func updateTenantSecret(namespace, datafield string) {
+func UpdateTenantSecret(namespace, datafield string) {
 	// import required environment variables
 	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
 	var kube KubeCLient
@@ -105,9 +107,9 @@ func updateTenantSecret(namespace, datafield string) {
 
 	sec := kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
 	sec.Data[datafield] = credbyte
+	// update secret ignore output validation is in main
+	_ = kube.UpdateSecret(kube.CreateClientSet(), namespace, sec)
 
-	updatedsec := kube.UpdateSecret(kube.CreateClientSet(), namespace, sec)
-	fmt.Printf("\n%v\n", string(updatedsec.Data[datafield]))
 }
 
 func PasswordSetter(t *TenantCredential) *TenantCredential {
