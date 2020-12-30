@@ -21,6 +21,12 @@ type ProxyCredentials struct {
 	} `yaml:"users"`
 }
 
+type Users struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Orgid    string `yaml:"orgid"`
+}
+
 type TenantCredential struct {
 	Server struct {
 		HTTPListenPort int `yaml:"http_listen_port"`

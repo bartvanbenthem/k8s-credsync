@@ -7,21 +7,42 @@ import (
 )
 
 func main() {
-	//TestCredentialFunctions()
-	//TestMainFunctions()
-
-	// Update and collect all tenant credentials
+	// Update and collect all current tenant credentials
 	tcreds, err := AllTenantCredentials()
 	if err != nil {
 		log.Printf("\n%v\n")
 	}
-
+	// Update and collect all current proxy credentials
 	pcreds, err := AllProxyCredentials()
 	if err != nil {
 		log.Printf("\n%v\n")
 	}
 
-	// Test credential functions
+	// create a slice with all the tenant usernames
+	// slice is used to compare to the current proxy users
+	var usernames []string
+	for _, pc := range pcreds.Users {
+		usernames = append(usernames, pc.Username)
+	}
+
+	// compare tenant credentials with proxy credentials
+	// apply new credentials to the proxy credentials
+	var newcreds Users
+	for _, tc := range tcreds {
+		b := Contains(usernames, tc.Client.BasicAuth.Username)
+		if b != true {
+			newcreds.Username = tc.Client.BasicAuth.Username
+			newcreds.Password = tc.Client.BasicAuth.Password
+			newcreds.Orgid = tc.Client.BasicAuth.Username
+			pcreds.Users = append(pcreds.Users, newcreds)
+		}
+	}
+
+	// update proxy kubernetes secret
+
+	// restart proxy container
+
+	// TEST FUNCTIONS WITH PRINTING OUTPUT
 	////////////////////////////////////////////////
 	fmt.Printf("\nTenant\n------\n")
 	for _, tc := range tcreds {
@@ -31,12 +52,21 @@ func main() {
 	}
 
 	fmt.Printf("\nProxy\n-----\n")
-	for _, p := range pcreds.Users {
+	for _, pc := range pcreds.Users {
 		fmt.Printf("User:%v Password:%v org:%v\n",
-			p.Username, p.Password, p.Orgid)
+			pc.Username, pc.Password, pc.Orgid)
 	}
 	////////////////////////////////////////////////
 
+}
+
+func Contains(source []string, value string) bool {
+	for _, item := range source {
+		if item == value {
+			return true
+		}
+	}
+	return false
 }
 
 // collects all proxy credentials
