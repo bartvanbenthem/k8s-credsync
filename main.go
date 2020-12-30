@@ -54,8 +54,12 @@ func main() {
 			tc.Client.BasicAuth.Password)
 	}
 
+	current, err := AllProxyCredentials()
+	if err != nil {
+		log.Printf("\n%v\n")
+	}
 	fmt.Printf("\nProxy\n-----\n")
-	for _, pc := range pcreds.Users {
+	for _, pc := range current.Users {
 		fmt.Printf("User:%v Password:%v org:%v\n",
 			pc.Username, pc.Password, pc.Orgid)
 	}

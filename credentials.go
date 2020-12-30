@@ -13,18 +13,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Users struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Orgid    string `yaml:"orgid"`
+}
+
 type ProxyCredentials struct {
 	Users []struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
 		Orgid    string `yaml:"orgid"`
 	} `yaml:"users"`
-}
-
-type Users struct {
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
-	Orgid    string `yaml:"orgid"`
 }
 
 type TenantCredential struct {
@@ -154,9 +154,9 @@ func PasswordGenerator() string {
 	return str
 }
 
-/////////////////////////////////////////////////////////////
-// ONLY USED FOR RAW JSON RESPONSE FROM THE KUBERNETES API
-/////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+// ONLY USED FOR RAW ENCODED JSON RESPONSE FROM THE KUBERNETES API /
+////////////////////////////////////////////////////////////////////
 
 func DecodeSecret(encoded string) string {
 	decoded, err := base64.StdEncoding.DecodeString(encoded)
