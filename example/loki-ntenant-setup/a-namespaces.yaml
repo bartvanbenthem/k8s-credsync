@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: co-monitoring
+  labels:
+    name: co-monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-alpha-dev
+  labels:
+    tenant: tenant-a
+    application: app
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-beta-test
+  labels:
+    tenant: tenant-b

@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# create namespaces
-kubectl create namespace 'co-monitoring'
-kubectl create namespace 'team-alpha-dev'
-kubectl create namespace 'team-beta-test'
-
 # apply the loki multi tenant setup
 kubectl apply -f .
 

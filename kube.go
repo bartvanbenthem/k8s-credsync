@@ -45,7 +45,7 @@ func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
 	sec, err := c.CoreV1().Secrets(namespace).Update(context.TODO(), secret, metav1.UpdateOptions{})
 	if err != nil {
-		fmt.Printf("\nUnable to retreive secret data field from: %v\n", namespace)
+		fmt.Printf("\nError Updating \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
 		fmt.Printf("%v\n", err)
 	}
 	return sec
@@ -54,7 +54,7 @@ func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, sec
 func (k *KubeCLient) GetSecret(c *kubernetes.Clientset, namespace, secretname string) *v1.Secret {
 	sec, err := c.CoreV1().Secrets(namespace).Get(context.TODO(), secretname, metav1.GetOptions{})
 	if err != nil {
-		fmt.Printf("\nUnable to retreive secret data field from: %v\n", namespace)
+		fmt.Printf("\nUnable to retreive secret from: %v\n", namespace)
 		fmt.Printf("%v\n", err)
 	}
 	return sec
@@ -73,7 +73,7 @@ func (k *KubeCLient) GetAllNamespaces(c *kubernetes.Clientset) []string {
 	var namespaces []string
 	ns, err := c.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Printf("\nError listing namespaces: %v\n", err)
+		log.Printf("\nError Listing Namespaces: %v\n", err)
 	}
 	for _, n := range ns.Items {
 		namespaces = append(namespaces, n.Name)
@@ -85,7 +85,7 @@ func (k *KubeCLient) GetAllPods(c *kubernetes.Clientset, namespace string) []str
 	var pods []string
 	ns, err := c.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Printf("\nError listing namespaces: %v\n", err)
+		log.Printf("\nError Listing Pods: %v\n", err)
 	}
 	for _, p := range ns.Items {
 		pods = append(pods, p.Name)
@@ -96,7 +96,8 @@ func (k *KubeCLient) GetAllPods(c *kubernetes.Clientset, namespace string) []str
 func (k *KubeCLient) DeletePod(c *kubernetes.Clientset, namespace, podname string) {
 	err := c.CoreV1().Pods(namespace).Delete(context.TODO(), podname, metav1.DeleteOptions{})
 	if err != nil {
-		log.Printf("\nError Deleting pod: %v\n", err)
+		log.Printf("\nError Deleting Pod: %v\n", err)
 	}
-	log.Printf("\nDeleted: %v\n", podname)
+	fmt.Println()
+	log.Printf("\nPod \"%v\" Deleted\n", podname)
 }

@@ -45,10 +45,10 @@ func main() {
 
 	// restart proxy
 	RestartProxy()
-
 	fmt.Printf("\nCredentials are synced and proxy has been restarted\n")
+
 	// test by getting the credentials from the current proxy and tenant secrets
-	//TestMainFunctions()
+	TestMainFunctions()
 }
 
 func Contains(source []string, value string) bool {
