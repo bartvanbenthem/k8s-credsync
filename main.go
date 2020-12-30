@@ -49,9 +49,6 @@ func main() {
 	// generate new log-recolector token in tenant namespaces
 	// !!!TODO
 
-	// restart log-recolector pod in tenant namespaces
-	// !!!TODO
-
 	// test by getting the credentials from the current proxy and tenant secrets
 	TestMainFunctions()
 }
@@ -66,8 +63,6 @@ func Contains(source []string, value string) bool {
 }
 
 func NewToken() {}
-
-func RestartLogRecolector() {}
 
 func RestartProxy() {
 	// initiate kube client

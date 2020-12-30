@@ -21,4 +21,3 @@ generate and synchronise basic auth credentials for all tenants with the authent
 * a kubernetes service account is used to athenticate and authorize the credsync service
 * proxy service needs to be restarted after config update (remove proxy pod)
 * a new log-recollector token needs to be created (remove old token)
-* log-relocator service needs to be restarted after config update (remove log-relocator pod)
