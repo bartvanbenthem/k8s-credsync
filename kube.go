@@ -42,15 +42,6 @@ func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 	return clientset
 }
 
-func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
-	sec, err := c.CoreV1().Secrets(namespace).Update(context.TODO(), secret, metav1.UpdateOptions{})
-	if err != nil {
-		fmt.Printf("\nError Updating \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
-		fmt.Printf("%v\n", err)
-	}
-	return sec
-}
-
 func (k *KubeCLient) GetSecret(c *kubernetes.Clientset, namespace, secretname string) *v1.Secret {
 	sec, err := c.CoreV1().Secrets(namespace).Get(context.TODO(), secretname, metav1.GetOptions{})
 	if err != nil {
@@ -67,6 +58,35 @@ func (k *KubeCLient) GetSecretData(c *kubernetes.Clientset, namespace, secretnam
 		fmt.Printf("%v\n", err)
 	}
 	return sec.Data[datafield]
+}
+
+func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
+	sec, err := c.CoreV1().Secrets(namespace).Update(context.TODO(), secret, metav1.UpdateOptions{})
+	if err != nil {
+		fmt.Printf("\nError Updating \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
+		fmt.Printf("%v\n", err)
+	}
+	return sec
+}
+
+func (k *KubeCLient) CreateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
+	sec, err := c.CoreV1().Secrets(namespace).Create(context.TODO(), secret, metav1.CreateOptions{})
+	if err != nil {
+		fmt.Printf("\nError Creating \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
+		fmt.Printf("%v\n", err)
+	}
+	return sec
+}
+
+func (k *KubeCLient) DeleteSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) {
+	fmt.Println("Deleting Secret...")
+	deletePolicy := metav1.DeletePropagationForeground
+	err := c.CoreV1().Secrets(namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
+	if err != nil {
+		fmt.Printf("\nError Deleting \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
+		fmt.Printf("%v\n", err)
+	}
+	fmt.Printf("\nDeleted \"%v\" Secret.\n", secret.Name)
 }
 
 func (k *KubeCLient) GetAllNamespaces(c *kubernetes.Clientset) []string {
@@ -101,3 +121,5 @@ func (k *KubeCLient) DeletePod(c *kubernetes.Clientset, namespace, podname strin
 	fmt.Println()
 	log.Printf("\nPod \"%v\" Deleted\n", podname)
 }
+
+func int32Ptr(i int32) *int32 { return &i }

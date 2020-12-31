@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"gopkg.in/yaml.v2"
+	v1 "k8s.io/api/core/v1"
 )
 
 type Users struct {
@@ -88,6 +89,52 @@ func GetTenantCredential(file string) (TenantCredential, error) {
 	return c, err
 }
 
+func ReplaceTenantSecret(namespace, datafield string) {
+	// import required environment variables
+	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
+	var kube KubeCLient
+	// create and set password in the tenant credential when password is empty
+	cred, err := GetTenantCredential(string(kube.GetSecretData(kube.CreateClientSet(),
+		namespace, tenantsec, datafield)))
+	if err != nil {
+		fmt.Printf("\n%v\n", err)
+	}
+	if len(cred.Client.BasicAuth.Username) != 0 {
+		PasswordSetter(&cred)
+	}
+
+	credbyte, err := yaml.Marshal(&cred)
+	if err != nil {
+		fmt.Printf("\nerror encoding yaml: %v\n", err)
+	}
+
+	sec := kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
+	sec.Data[datafield] = credbyte
+
+	// create new secret
+	var newsecret v1.Secret
+	newsecret.Kind = sec.Kind
+	newsecret.APIVersion = sec.APIVersion
+	newsecret.Data = map[string][]byte{datafield: credbyte}
+	newsecret.Name = sec.Name
+	newsecret.Namespace = sec.Namespace
+
+	// delete secret
+	kube.DeleteSecret(kube.CreateClientSet(), namespace, sec)
+
+	// ONLY FOR TESTING PURPOSES
+	// CREATE A SECRET EXISTS CHECK FUNCTION INSTEAD OF SLEEP !!!!!!!!
+	time.Sleep(3 * time.Second)
+
+	// create secret
+	_ = kube.CreateSecret(kube.CreateClientSet(), namespace, &newsecret)
+
+	_ = kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+	}
+}
+
 func UpdateProxySecret(namespace, datafield string, newc ProxyCredentials) {
 	// import required environment variables
 	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
@@ -127,6 +174,7 @@ func UpdateTenantSecret(namespace, datafield string) {
 
 	sec := kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
 	sec.Data[datafield] = credbyte
+
 	// update secret ignore output validation is in main
 	_ = kube.UpdateSecret(kube.CreateClientSet(), namespace, sec)
 

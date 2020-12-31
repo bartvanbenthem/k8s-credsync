@@ -46,9 +46,6 @@ func main() {
 	RestartProxy()
 	fmt.Printf("\nCredentials are synced and proxy has been restarted\n")
 
-	// generate new log-recolector token in tenant namespaces
-	// !!!TODO
-
 	// test by getting the credentials from the current proxy and tenant secrets
 	TestMainFunctions()
 }
@@ -61,8 +58,6 @@ func Contains(source []string, value string) bool {
 	}
 	return false
 }
-
-func NewToken() {}
 
 func RestartProxy() {
 	// initiate kube client
@@ -114,7 +109,7 @@ func AllTenantCredentials() ([]TenantCredential, error) {
 		s := kube.GetSecretData(kube.CreateClientSet(),
 			ns, tenantsec, "promtail.yaml")
 		if len(s) != 0 {
-			UpdateTenantSecret(ns, "promtail.yaml")
+			ReplaceTenantSecret(ns, "promtail.yaml")
 			// get updated tenant credential
 			// append updated credentials to slice of tenant credential
 			upd, err := GetTenantCredential(string(kube.GetSecretData(
