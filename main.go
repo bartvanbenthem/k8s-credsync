@@ -40,11 +40,15 @@ func main() {
 	}
 
 	// update proxy kubernetes secret
-	UpdateProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
+	ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		"authn.yaml", pcreds)
+
 	// restart proxy
 	RestartProxy()
 	fmt.Printf("\nCredentials are synced and proxy has been restarted\n")
+
+	// restart log-recollector
+	// TODO !!!!!
 
 	// test by getting the credentials from the current proxy and tenant secrets
 	TestMainFunctions()
@@ -67,7 +71,7 @@ func RestartProxy() {
 	pods := kube.GetAllPods(kube.CreateClientSet(),
 		os.Getenv("K8S_PROXY_SECRET_NAMESPACE"))
 	for _, p := range pods {
-		if strings.Contains(p, os.Getenv("K8S_TENANT_POD_NAME")) {
+		if strings.Contains(p, os.Getenv("K8S_PROXY_POD_NAME")) {
 			kube.DeletePod(kube.CreateClientSet(),
 				os.Getenv("K8S_PROXY_SECRET_NAMESPACE"), p)
 		}

@@ -75,6 +75,7 @@ func (k *KubeCLient) CreateSecret(c *kubernetes.Clientset, namespace string, sec
 		fmt.Printf("\nError Creating \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
 		fmt.Printf("%v\n", err)
 	}
+	fmt.Printf("\nCreated \"%v\" Secret.\n", secret.Name)
 	return sec
 }
 
