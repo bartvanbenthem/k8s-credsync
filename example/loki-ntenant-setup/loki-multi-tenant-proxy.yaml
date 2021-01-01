@@ -8,9 +8,9 @@ metadata:
 stringData:
   authn.yaml: |-
     users:
-      - username: team-alpha-dev
-        password: alpha
-        orgid: team-alpha-dev
+      - username: example
+        password: example
+        orgid: example
 ---
 apiVersion: v1
 kind: Service
