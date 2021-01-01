@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -40,18 +42,13 @@ func main() {
 	}
 
 	// update proxy kubernetes secret
-	ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
-		"authn.yaml", pcreds)
-
+	ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"), "authn.yaml", pcreds)
 	// restart proxy
-	RestartProxy()
-	fmt.Printf("\nCredentials are synced and proxy has been restarted\n")
-
-	// restart log-recollector
-	// TODO !!!!!
+	RestartPod(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"), os.Getenv("K8S_PROXY_POD_NAME"))
+	fmt.Printf("\nproxy has been restarted\n")
 
 	// test by getting the credentials from the current proxy and tenant secrets
-	TestMainFunctions()
+	TestGetProxyCredentials()
 }
 
 func Contains(source []string, value string) bool {
@@ -63,17 +60,15 @@ func Contains(source []string, value string) bool {
 	return false
 }
 
-func RestartProxy() {
+func RestartPod(namespace, podname string) {
 	// initiate kube client
 	var kube KubeCLient
 	// restart proxy pod by deleting pod
 	// the replicaset will create a new pod with updated config
-	pods := kube.GetAllPods(kube.CreateClientSet(),
-		os.Getenv("K8S_PROXY_SECRET_NAMESPACE"))
+	pods := kube.GetAllPodNames(kube.CreateClientSet(), namespace)
 	for _, p := range pods {
-		if strings.Contains(p, os.Getenv("K8S_PROXY_POD_NAME")) {
-			kube.DeletePod(kube.CreateClientSet(),
-				os.Getenv("K8S_PROXY_SECRET_NAMESPACE"), p)
+		if strings.Contains(p, podname) {
+			kube.DeletePod(kube.CreateClientSet(), namespace, p)
 		}
 	}
 }
@@ -108,20 +103,31 @@ func AllTenantCredentials() ([]TenantCredential, error) {
 	//set slice of tenant credential
 	var tcreds []TenantCredential
 
-	namespaces := kube.GetAllNamespaces(kube.CreateClientSet())
+	namespaces := kube.GetAllNamespaceNames(kube.CreateClientSet())
 	for _, ns := range namespaces {
+		var c TenantCredential
 		s := kube.GetSecretData(kube.CreateClientSet(),
 			ns, tenantsec, "promtail.yaml")
 		if len(s) != 0 {
-			ReplaceTenantSecret(ns, "promtail.yaml")
-			// get updated tenant credential
-			// append updated credentials to slice of tenant credential
-			upd, err := GetTenantCredential(string(kube.GetSecretData(
-				kube.CreateClientSet(), ns, tenantsec, "promtail.yaml")))
+			err = yaml.Unmarshal(s, &c)
 			if err != nil {
 				return nil, err
 			}
-			tcreds = append(tcreds, upd)
+			if len(c.Client.BasicAuth.Password) == 0 {
+				ReplaceTenantSecret(ns, "promtail.yaml")
+				// get updated tenant credential
+				// append updated credentials to slice of tenant credential
+				upd, err := GetTenantCredential(string(kube.GetSecretData(
+					kube.CreateClientSet(), ns, tenantsec, "promtail.yaml")))
+				if err != nil {
+					return nil, err
+				}
+				tcreds = append(tcreds, upd)
+
+				// restart log-recollector pod
+				RestartPod(ns, os.Getenv("K8S_TENANT_POD_NAME"))
+				fmt.Printf("\nlog-recollector Pod has been restarted\n")
+			}
 		}
 	}
 	return tcreds, err

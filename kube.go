@@ -80,7 +80,7 @@ func (k *KubeCLient) CreateSecret(c *kubernetes.Clientset, namespace string, sec
 }
 
 func (k *KubeCLient) DeleteSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) {
-	fmt.Println("Deleting Secret...")
+	fmt.Printf("\nDeleting Secret...\n")
 	deletePolicy := metav1.DeletePropagationForeground
 	err := c.CoreV1().Secrets(namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
 	if err != nil {
@@ -90,7 +90,7 @@ func (k *KubeCLient) DeleteSecret(c *kubernetes.Clientset, namespace string, sec
 	fmt.Printf("\nDeleted \"%v\" Secret.\n", secret.Name)
 }
 
-func (k *KubeCLient) GetAllNamespaces(c *kubernetes.Clientset) []string {
+func (k *KubeCLient) GetAllNamespaceNames(c *kubernetes.Clientset) []string {
 	var namespaces []string
 	ns, err := c.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -102,7 +102,7 @@ func (k *KubeCLient) GetAllNamespaces(c *kubernetes.Clientset) []string {
 	return namespaces
 }
 
-func (k *KubeCLient) GetAllPods(c *kubernetes.Clientset, namespace string) []string {
+func (k *KubeCLient) GetAllPodNames(c *kubernetes.Clientset, namespace string) []string {
 	var pods []string
 	ns, err := c.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
