@@ -20,7 +20,6 @@ generate and synchronise basic auth credentials for all tenants with the authent
 * go-client sdk is used to interract with the kubernetes API
 * a kubernetes service account is used to athenticate and authorize the credsync service
 * proxy service needs to be restarted after config update (remove pod)
-* log-recollector service needs to be restarted after config update (remove pod)
 
 # TODO
 * create a function that checks if a kubernetes resource object exists to replace temp wait func

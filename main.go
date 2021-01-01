@@ -123,10 +123,6 @@ func AllTenantCredentials() ([]TenantCredential, error) {
 					return nil, err
 				}
 				tcreds = append(tcreds, upd)
-
-				// restart log-recollector pod
-				RestartPod(ns, os.Getenv("K8S_TENANT_POD_NAME"))
-				fmt.Printf("\nlog-recollector Pod has been restarted\n")
 			}
 		}
 	}
