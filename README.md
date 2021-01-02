@@ -1,5 +1,5 @@
 # k8s-ntenant-credsync
-generate and synchronise basic auth credentials for all tenants with the authentication proxy 
+Synchronise basic auth credentials for all tenants with the authentication proxy 
 
 ### min requirements credsync
 * the tenant secret name to scan is set with an environment variable. 
