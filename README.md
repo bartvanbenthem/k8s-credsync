@@ -1,4 +1,4 @@
-# k8s-credsync
+# k8s-ntenant-credsync
 generate and synchronise basic auth credentials for all tenants with the authentication proxy 
 
 ### min requirements credsync
