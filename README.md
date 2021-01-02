@@ -9,10 +9,6 @@ generate and synchronise basic auth credentials for all tenants with the authent
 
 * if the tenant secret is not registered in the auth-proxy secret, the auth-proxy is updated
 
-### grafana datasource requiremenst
-* grafana organisation names must always match the tenants namespace name and auth-proxy orgid
-* grafana datasource configurations need to be created or updated with the credentials from the auth-proxy secret
-
 ### technical choices
 * go-client sdk is used to interract with the kubernetes API
 * a kubernetes service account is used to athenticate and authorize the credsync service
