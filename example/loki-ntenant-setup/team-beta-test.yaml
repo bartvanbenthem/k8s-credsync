@@ -76,7 +76,7 @@ stringData:
       url: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100/api/prom/push
       basic_auth:
         username: team-beta-test
-        password: BBBAssD444D345s555g988
+        password: BBBAssD444D345s555g988N
     scrape_configs:
       - job_name: containers
         static_configs:
