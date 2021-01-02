@@ -1,13 +1,8 @@
 package main
 
 import (
-	"bufio"
-	"encoding/base64"
 	"fmt"
-	"log"
-	"math/rand"
 	"os"
-	"strings"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -115,7 +110,7 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 
 	// ONLY FOR TESTING PURPOSES
 	// CREATE A SECRET EXISTS CHECK FUNCTION INSTEAD OF SLEEP !!!!!!!!
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	// create secret
 	_ = kube.CreateSecret(kube.CreateClientSet(), namespace, &newsecret)
@@ -124,112 +119,4 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
-}
-
-func ReplaceTenantSecret(namespace, datafield string) {
-	// import required environment variables
-	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
-	var kube KubeCLient
-	// create and set password in the tenant credential when password is empty
-	cred, err := GetTenantCredential(string(kube.GetSecretData(kube.CreateClientSet(),
-		namespace, tenantsec, datafield)))
-	if err != nil {
-		fmt.Printf("\n%v\n", err)
-	}
-	if len(cred.Client.BasicAuth.Username) != 0 {
-		PasswordSetter(&cred)
-	}
-
-	credbyte, err := yaml.Marshal(&cred)
-	if err != nil {
-		fmt.Printf("\nerror encoding yaml: %v\n", err)
-	}
-
-	sec := kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
-	sec.Data[datafield] = credbyte
-
-	// create new secret object
-	var newsecret v1.Secret
-	newsecret.Kind = sec.Kind
-	newsecret.APIVersion = sec.APIVersion
-	newsecret.Data = map[string][]byte{datafield: credbyte}
-	newsecret.Name = sec.Name
-	newsecret.Namespace = sec.Namespace
-
-	// delete secret
-	kube.DeleteSecret(kube.CreateClientSet(), namespace, sec)
-
-	// ONLY FOR TESTING PURPOSES
-	// CREATE A SECRET EXISTS CHECK FUNCTION INSTEAD OF SLEEP !!!!!!!!
-	time.Sleep(3 * time.Second)
-
-	// create secret
-	_ = kube.CreateSecret(kube.CreateClientSet(), namespace, &newsecret)
-
-	_ = kube.GetSecret(kube.CreateClientSet(), namespace, tenantsec)
-	if err != nil {
-		fmt.Printf("%v\n", err)
-	}
-}
-
-func PasswordSetter(t *TenantCredential) *TenantCredential {
-	if len(t.Client.BasicAuth.Password) == 0 {
-		t.Client.BasicAuth.Password = PasswordGenerator()
-	}
-	return t
-}
-
-func PasswordGenerator() string {
-	var str string
-	rand.Seed(time.Now().UnixNano())
-	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-		"abcdefghijklmnopqrstuvwxyz" +
-		"0123456789")
-	length := 12
-	var b strings.Builder
-	for i := 0; i < length; i++ {
-		b.WriteRune(chars[rand.Intn(len(chars))])
-	}
-	str = b.String()
-	return str
-}
-
-////////////////////////////////////////////////////////////////////
-// ONLY USED FOR RAW ENCODED JSON RESPONSE FROM THE KUBERNETES API /
-////////////////////////////////////////////////////////////////////
-
-func DecodeSecret(encoded string) string {
-	decoded, err := base64.StdEncoding.DecodeString(encoded)
-	if err != nil {
-		log.Fatalf("Error decoding: %v", err)
-	}
-	return string(decoded)
-}
-
-// extract the encoded secret from the k8s json response
-func GetEncodedSecret(jsonresponse, partial string) (string, error) {
-	var err error
-	var lines []string
-	// Scan all the lines in sd byte slice
-	// append every line to the lines slice of string
-	scanner := bufio.NewScanner(strings.NewReader(jsonresponse))
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	if err != nil {
-		return "", err
-	}
-	// check every line on the given partial
-	// split the line on :
-	for _, line := range lines {
-		if strings.Contains(line, partial) {
-			lines = strings.Split(line, ":")
-		}
-	}
-	// remove unwanted charachters and spaces
-	str := lines[1]
-	str = strings.ReplaceAll(str, "\"", "")
-	str = strings.ReplaceAll(str, " ", "")
-
-	return str, err
 }

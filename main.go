@@ -113,17 +113,7 @@ func AllTenantCredentials() ([]TenantCredential, error) {
 			if err != nil {
 				return nil, err
 			}
-			if len(c.Client.BasicAuth.Password) == 0 {
-				ReplaceTenantSecret(ns, "promtail.yaml")
-				// get updated tenant credential
-				// append updated credentials to slice of tenant credential
-				upd, err := GetTenantCredential(string(kube.GetSecretData(
-					kube.CreateClientSet(), ns, tenantsec, "promtail.yaml")))
-				if err != nil {
-					return nil, err
-				}
-				tcreds = append(tcreds, upd)
-			}
+			tcreds = append(tcreds, c)
 		}
 	}
 	return tcreds, err
