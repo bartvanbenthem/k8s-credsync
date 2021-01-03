@@ -3,7 +3,7 @@
   "type": "loki",
   "url": "http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100",
   "access": "proxy",
-  "orgId":6,
+  "orgId":16,
   "basicAuth": true,
   "basicAuthUser": "team-alpha-dev",
   "secureJsonData": {

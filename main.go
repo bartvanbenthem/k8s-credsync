@@ -28,16 +28,41 @@ func Grafana2Proxy() {
 		log.Printf("\n%v\n")
 	}
 
-	for _, org := range pcreds.Users {
-		o := grafana.GetOrganization(org.Username)
+	// Scan and Create Organizations
+	for _, p := range pcreds.Users {
+		o := grafana.GetOrganization(p.Username)
 		if len(o.Name) != 0 {
 			fmt.Printf("id: %v name: %v\n", o.ID, o.Name)
 		} else {
-			fmt.Printf("Organization: %v does not exist\n", org)
-			organization := grafana.Organization{Name: org.Username}
+			fmt.Printf("Organization: %v does not exist\n", p)
+			organization := grafana.Organization{Name: p.Username}
 			grafana.CreateOrganization(organization)
 		}
 	}
+
+	// Scan an create datasources
+	for _, p := range pcreds.Users {
+		o := grafana.GetOrganization(p.Username)
+		if len(o.Name) == 0 {
+			fmt.Printf("Error: Organization %v Cannot be found\n", p.Username)
+		}
+		ds := grafana.GetDatasource(p.Username)
+		if len(ds.Name) != 0 {
+			fmt.Printf("Datasource %v exists\n", ds.Name)
+		} else {
+			var datasource grafana.Datasource
+			datasource.Name = p.Username
+			datasource.Type = "loki"
+			datasource.URL = os.Getenv("K8S_PROXY_URL_PORT")
+			datasource.Access = "proxy"
+			datasource.OrgID = o.ID
+			datasource.BasicAuth = true
+			datasource.BasicAuthUser = p.Username
+			datasource.SecureJSONData.BasicAuthPassword = p.Password
+			grafana.CreateDatasource(datasource)
+		}
+	}
+	fmt.Printf("\nGrafana Orgs and Datasources are in sync\n")
 }
 
 func Tenant2Proxy() {

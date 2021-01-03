@@ -36,16 +36,33 @@ type Organization struct {
 	} `json:"address"`
 }
 
-func GetDatasource() {
-
+func GetDatasource(dsname string) Datasource {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("http://%v/datasources/name/%v", grafanapi, dsname)
+	data := RequestAUTH("GET", url, []byte(""))
+	var ds Datasource
+	err := json.Unmarshal(data, &ds)
+	if err != nil {
+		fmt.Errorf("Got error %s", err.Error())
+	}
+	return ds
 }
 
-func CreateDatasource() {
-
+func CreateDatasource(ds Datasource) {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("http://%v/datasources", grafanapi)
+	b, err := json.Marshal(&ds)
+	if err != nil {
+		fmt.Errorf("Got error %s", err.Error())
+	}
+	fmt.Printf("\nCreating %v Grafana Datasource\n", ds.Name)
+	data := RequestAUTH("POST", url, b)
+	fmt.Printf("%v\n", string(data))
 }
 
 func GetOrganization(orgname string) Organization {
-	url := fmt.Sprintf("http://grafana/api/orgs/name/%v", orgname)
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("http://%v/orgs/name/%v", grafanapi, orgname)
 	data := RequestAUTH("GET", url, []byte(""))
 	var org Organization
 	err := json.Unmarshal(data, &org)
@@ -56,7 +73,8 @@ func GetOrganization(orgname string) Organization {
 }
 
 func CreateOrganization(org Organization) {
-	url := fmt.Sprintf("http://grafana/api/orgs")
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("http://%v/orgs", grafanapi)
 	b, err := json.Marshal(&org)
 	if err != nil {
 		fmt.Errorf("Got error %s", err.Error())
