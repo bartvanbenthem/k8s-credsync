@@ -39,7 +39,7 @@ export K8S_GRAFANA_API_URL='grafana/api'
 ```
 ## Run Sync services
 ```shell
-$ git clone
+$ git clone https://github.com/bartvanbenthem/k8s-ntenant-sync.git
 $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 ```
 
