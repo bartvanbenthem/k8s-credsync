@@ -23,9 +23,12 @@ func main() {
 		if len(o.Name) != 0 {
 			fmt.Printf("id: %v name: %v\n", o.ID, o.Name)
 		} else {
-			fmt.Printf("name: %v does not exist\n", org)
+			fmt.Printf("Organization: %v does not exist\n", org)
+			organization := grafana.Organization{Name: org}
+			grafana.CreateOrganization(organization)
 		}
 	}
+
 }
 
 func Tenant2Proxy() {

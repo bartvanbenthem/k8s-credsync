@@ -1,5 +1,5 @@
 {
-  "name": "loki",
+  "name": "team-alpha-dev",
   "type": "loki",
   "url": "http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100",
   "access": "proxy",
@@ -10,4 +10,3 @@
     "basicAuthPassword": "jDSAssD444D345s435g234N"
   }
 }
- 

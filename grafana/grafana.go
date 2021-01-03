@@ -1,6 +1,7 @@
 package grafana
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -35,13 +36,17 @@ type Organization struct {
 	} `json:"address"`
 }
 
-func CreateDatasource() {}
+func GetDatasource() {
 
-func CreateOrganization() {}
+}
+
+func CreateDatasource() {
+
+}
 
 func GetOrganization(orgname string) Organization {
 	url := fmt.Sprintf("http://grafana/api/orgs/name/%v", orgname)
-	data := RequestAUTH(url, "GET")
+	data := RequestAUTH("GET", url, []byte(""))
 	var org Organization
 	err := json.Unmarshal(data, &org)
 	if err != nil {
@@ -50,11 +55,23 @@ func GetOrganization(orgname string) Organization {
 	return org
 }
 
-func RequestAUTH(url, method string) []byte {
+func CreateOrganization(org Organization) {
+	url := fmt.Sprintf("http://grafana/api/orgs")
+	b, err := json.Marshal(&org)
+	if err != nil {
+		fmt.Errorf("Got error %s", err.Error())
+	}
+	fmt.Printf("\nCreating %v Grafana Organization\n", org.Name)
+	data := RequestAUTH("POST", url, b)
+	fmt.Printf("%v\n", string(data))
+}
+
+func RequestAUTH(method, url string, body []byte) []byte {
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		fmt.Errorf("Got error %s", err.Error())
 	}
