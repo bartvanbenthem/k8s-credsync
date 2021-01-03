@@ -57,7 +57,6 @@ func GetTenantCredential(file string) (TenantCredential, error) {
 }
 
 // collects all tenant credentials
-// updates credentials when password is an empty string
 func AllTenantCredentials() ([]TenantCredential, error) {
 	var err error
 	// import environment variable
