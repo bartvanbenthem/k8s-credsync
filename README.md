@@ -1,5 +1,5 @@
 # k8s-ntenant-sync
-Synchronise credentials for all tenants with the authentication proxy and grafana configurations. Grafana Organizations and Datasources will be provisioned for multi tenant logging capabilities.
+Synchronise credentials for all tenants with the authentication proxy and grafana configurations. Grafana Organizations and Datasources will be provisioned and configured automatically for instant multi tenant logging capabilities.
 
 ### technical choices
 * github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
