@@ -20,7 +20,7 @@ Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 $ git clone https://github.com/bartvanbenthem/k8s-ntenant-sync.git
 # deploy Loki and proxy for a multi-tenant logging setup
 $ cd k8s-ntenant-sync/build/loki-ntenant-setup/
-$ ./run.sh
+$ ./deploy.sh
 ```
 
 ### Set environment variables
