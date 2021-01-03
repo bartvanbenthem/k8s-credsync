@@ -17,5 +17,14 @@ Synchronise basic auth credentials for all tenants with the authentication proxy
 # TODO
 * create a function that checks if a kubernetes resource object exists to replace temp wait func
 * when a tenant password does not match the auth-proxy password, the auth proxy is updated
+* Provision Grafana Organizations and Datasources based on auth proxy credentials
 
+### grafana datasource provisioning
+* grafana organisation names must always match the tenants namespace name and auth-proxy orgid
+* grafana datasource configurations need to be created or updated with the credentials from the auth-proxy secret
 
+* get all proxy credentials.
+* get all grafana organizations.
+* compare proxy credential names with organization names.
+* if proxy credential doesn`t map to an organization, create a new organization.
+* connect new organization to the loki multi tenant proxy with the proxy credentials.

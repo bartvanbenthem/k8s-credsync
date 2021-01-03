@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+
+	"github.com/bartvanbenthem/k8s-credsync/proxy"
+	"github.com/bartvanbenthem/k8s-credsync/tenant"
 )
 
 func TestGetProxyCredentials() {
 	// Prints the current proxycredentials
-	pcurrent, err := AllProxyCredentials()
+	pcurrent, err := proxy.AllProxyCredentials()
 	if err != nil {
 		log.Printf("\n%v\n")
 	}
@@ -21,7 +24,7 @@ func TestGetProxyCredentials() {
 // Prints the current tenant and proxy credentials
 func TestMainFunctions() {
 	// Prints the current tenant credentials
-	tcurrent, err := AllTenantCredentials()
+	tcurrent, err := tenant.AllTenantCredentials()
 	fmt.Printf("\nTenant\n------\n")
 	for _, tc := range tcurrent {
 		fmt.Printf("User:%v Password:%v\n",
@@ -30,7 +33,7 @@ func TestMainFunctions() {
 	}
 
 	// Prints the current proxycredentials
-	pcurrent, err := AllProxyCredentials()
+	pcurrent, err := proxy.AllProxyCredentials()
 	if err != nil {
 		log.Printf("\n%v\n")
 	}

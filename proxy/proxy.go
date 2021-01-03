@@ -1,10 +1,11 @@
-package main
+package proxy
 
 import (
 	"fmt"
 	"os"
 	"time"
 
+	"github.com/bartvanbenthem/k8s-credsync/kube"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
 )
@@ -23,43 +24,6 @@ type ProxyCredentials struct {
 	} `yaml:"users"`
 }
 
-type TenantCredential struct {
-	Server struct {
-		HTTPListenPort int `yaml:"http_listen_port"`
-		GrpcListenPort int `yaml:"grpc_listen_port"`
-	} `yaml:"server"`
-	Client struct {
-		URL       string `yaml:"url"`
-		BasicAuth struct {
-			Username string `yaml:"username"`
-			Password string `yaml:"password"`
-		} `yaml:"basic_auth"`
-	} `yaml:"client"`
-	ScrapeConfigs []struct {
-		JobName       string `yaml:"job_name"`
-		StaticConfigs []struct {
-			Targets []string `yaml:"targets"`
-			Labels  struct {
-				Job  string `yaml:"job"`
-				Path string `yaml:"__path__"`
-			} `yaml:"labels"`
-		} `yaml:"static_configs"`
-		PipelineStages []struct {
-			Regex struct {
-				Expression string `yaml:"expression"`
-			} `yaml:"regex,omitempty"`
-			Labels struct {
-				Namespace interface{} `yaml:"namespace"`
-				Pod       interface{} `yaml:"pod"`
-				Container interface{} `yaml:"container"`
-			} `yaml:"labels,omitempty"`
-			Output struct {
-				Source string `yaml:"source"`
-			} `yaml:"output,omitempty"`
-		} `yaml:"pipeline_stages"`
-	} `yaml:"scrape_configs"`
-}
-
 // input is a decoded yaml config file from the secret
 func GetProxyCredentials(file string) (ProxyCredentials, error) {
 	var err error
@@ -72,22 +36,10 @@ func GetProxyCredentials(file string) (ProxyCredentials, error) {
 	return c, err
 }
 
-// input is a decoded yaml config file from the secret
-func GetTenantCredential(file string) (TenantCredential, error) {
-	var err error
-	var c TenantCredential
-	// unmarshall entire tenant JSON into a map
-	err = yaml.Unmarshal([]byte(file), &c)
-	if err != nil {
-		return c, err
-	}
-	return c, err
-}
-
 func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 	// import required environment variables
 	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
-	var kube KubeCLient
+	var kube kube.KubeCLient
 
 	credbyte, err := yaml.Marshal(&newc)
 	if err != nil {
@@ -119,4 +71,23 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
+}
+
+// collects all proxy credentials
+func AllProxyCredentials() (ProxyCredentials, error) {
+	var err error
+	// import environment variables
+	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
+	proxyns := os.Getenv("K8S_PROXY_SECRET_NAMESPACE")
+	// initiate kube client
+	var kube kube.KubeCLient
+
+	// get the proxy credentials
+	proxycred, err := GetProxyCredentials(string(
+		kube.GetSecretData(kube.CreateClientSet(),
+			proxyns, proxysec, "authn.yaml")))
+	if err != nil {
+		return proxycred, err
+	}
+	return proxycred, err
 }
