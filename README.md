@@ -24,6 +24,25 @@ Synchronise credentials for all tenants with the authentication proxy and grafan
 * if proxy credential doesnt map to an organization, create a new organization.
 * connect new organization to the loki multi tenant proxy with the proxy credentials.
 
+## Set environment variables
+```shell
+export K8S_KUBECONFIG='/var/snap/microk8s/current/credentials/client.config'
+export K8S_PROXY_SECRET_NAME='loki-multi-tenant-proxy-auth-config'
+export K8S_PROXY_SECRET_NAMESPACE='co-monitoring'
+export K8S_TENANT_SECRET_NAME='log-recolector-config'
+export K8S_PROXY_POD_NAME='loki-multi-tenant-proxy-'
+export K8S_PROXY_URL_PORT='http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
+
+export K8S_GRAFANA_BA_USER='admin'
+export K8S_GRAFANA_BA_PASSWORD='prom-operator'
+export K8S_GRAFANA_API_URL='grafana/api'
+```
+## Run Sync services
+```shell
+$ git clone
+$ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
+```
+
 # TODO
 * create a function that checks if a kubernetes resource object exists to replace temp wait func.
 * expose both sync functions through 2 api endpoints (net/http).
