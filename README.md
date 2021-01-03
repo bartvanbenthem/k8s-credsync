@@ -1,5 +1,5 @@
 # k8s-ntenant-sync
-Synchronise credentials for all tenants with the authentication proxy and grafana configurations.
+Synchronise credentials for all tenants with the authentication proxy and grafana configurations. Grafana Organizations and Datasources will be provisioned for multi tenant logging capabilities.
 
 ### technical choices
 * github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
@@ -18,7 +18,9 @@ Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 ## Install and run
 ```shell
 $ git clone https://github.com/bartvanbenthem/k8s-ntenant-sync.git
-$ kubectl apply -f k8s-ntenant-sync/build/loki-ntenant-setup/.
+# deploy Loki and proxy for a multi-tenant logging setup
+$ cd k8s-ntenant-sync/build/loki-ntenant-setup/
+$ ./run.sh
 ```
 
 ### Set environment variables
