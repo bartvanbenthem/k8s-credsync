@@ -12,57 +12,12 @@ import (
 
 func main() {
 	//Start the tenant 2 proxy sync
-	//Tenant2Proxy()
-
+	Tenant2Proxy()
 	// test by getting the credentials from the current proxy secret
 	//TestGetProxyCredentials()
 
 	//Start the Grafana 2 proxy sync
 	Grafana2Proxy()
-
-}
-func Grafana2Proxy() {
-	// Collect all current proxy credentials
-	pcreds, err := proxy.AllProxyCredentials()
-	if err != nil {
-		log.Printf("\n%v\n")
-	}
-
-	// Scan and Create Organizations
-	for _, p := range pcreds.Users {
-		o := grafana.GetOrganization(p.Username)
-		if len(o.Name) != 0 {
-			fmt.Printf("id: %v name: %v\n", o.ID, o.Name)
-		} else {
-			fmt.Printf("Organization: %v does not exist\n", p)
-			organization := grafana.Organization{Name: p.Username}
-			grafana.CreateOrganization(organization)
-		}
-	}
-
-	// Scan an create datasources
-	for _, p := range pcreds.Users {
-		o := grafana.GetOrganization(p.Username)
-		if len(o.Name) == 0 {
-			fmt.Printf("Error: Organization %v Cannot be found\n", p.Username)
-		}
-		ds := grafana.GetDatasource(p.Username)
-		if len(ds.Name) != 0 {
-			fmt.Printf("Datasource %v exists\n", ds.Name)
-		} else {
-			var datasource grafana.Datasource
-			datasource.Name = p.Username
-			datasource.Type = "loki"
-			datasource.URL = os.Getenv("K8S_PROXY_URL_PORT")
-			datasource.Access = "proxy"
-			datasource.OrgID = o.ID
-			datasource.BasicAuth = true
-			datasource.BasicAuthUser = p.Username
-			datasource.SecureJSONData.BasicAuthPassword = p.Password
-			grafana.CreateDatasource(datasource)
-		}
-	}
-	fmt.Printf("\nGrafana Orgs and Datasources are in sync\n")
 }
 
 func Tenant2Proxy() {
@@ -104,6 +59,53 @@ func Tenant2Proxy() {
 	proxy.RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		os.Getenv("K8S_PROXY_POD_NAME"))
 	fmt.Printf("\nproxy has been restarted\n")
+}
+
+func Grafana2Proxy() {
+	// Collect all current proxy credentials
+	pcreds, err := proxy.AllProxyCredentials()
+	if err != nil {
+		log.Printf("\n%v\n")
+	}
+
+	// Scan and Create Organizations
+	for _, p := range pcreds.Users {
+		o := grafana.GetOrganization(p.Username)
+		if len(o.Name) != 0 {
+			fmt.Printf("id: %v name: %v\n", o.ID, o.Name)
+		} else {
+			fmt.Printf("Organization: %v does not exist\n", p)
+			organization := grafana.Organization{Name: p.Username}
+			grafana.CreateOrganization(organization)
+		}
+	}
+
+	// Scan an create datasources
+	for _, p := range pcreds.Users {
+		o := grafana.GetOrganization(p.Username)
+		if len(o.Name) == 0 {
+			fmt.Printf("Error: Organization %v Cannot be found\n", p.Username)
+		}
+		ds := grafana.GetDatasource(p.Username)
+		var datasource grafana.Datasource
+		datasource.Name = p.Username
+		datasource.Type = "loki"
+		datasource.URL = os.Getenv("K8S_PROXY_URL_PORT")
+		datasource.Access = "proxy"
+		datasource.OrgID = o.ID
+		datasource.BasicAuth = true
+		datasource.BasicAuthUser = p.Username
+		datasource.SecureJSONData.BasicAuthPassword = p.Password
+		if len(ds.Name) != 0 {
+			fmt.Printf("Datasource %v exists\n", ds.Name)
+		} else {
+			// switch the user context to the correct organization
+			grafana.SwitchUserContext(o)
+			// create datasource in the current context
+			grafana.CreateDatasource(datasource)
+		}
+	}
+	fmt.Printf("\nGrafana Orgs and Datasources are in sync\n")
 }
 
 func Contains(source []string, value string) bool {

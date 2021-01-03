@@ -12,6 +12,7 @@ import (
 
 type Datasource struct {
 	Name           string `json:"name"`
+	ID             int    `json:id`
 	Type           string `json:"type"`
 	URL            string `json:"url"`
 	Access         string `json:"access"`
@@ -36,27 +37,15 @@ type Organization struct {
 	} `json:"address"`
 }
 
-func GetDatasource(dsname string) Datasource {
+func SwitchUserContext(org Organization) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/datasources/name/%v", grafanapi, dsname)
-	data := RequestAUTH("GET", url, []byte(""))
-	var ds Datasource
-	err := json.Unmarshal(data, &ds)
+	url := fmt.Sprintf("http://%v/user/using/%v", grafanapi, org.ID)
+	o, err := json.Marshal(&org)
 	if err != nil {
 		fmt.Errorf("Got error %s", err.Error())
 	}
-	return ds
-}
-
-func CreateDatasource(ds Datasource) {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/datasources", grafanapi)
-	b, err := json.Marshal(&ds)
-	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
-	}
-	fmt.Printf("\nCreating %v Grafana Datasource\n", ds.Name)
-	data := RequestAUTH("POST", url, b)
+	fmt.Printf("\nSwitching to %v Organization\n", org.Name)
+	data := RequestAUTH("POST", url, o)
 	fmt.Printf("%v\n", string(data))
 }
 
@@ -84,6 +73,42 @@ func CreateOrganization(org Organization) {
 	fmt.Printf("%v\n", string(data))
 }
 
+func GetDatasource(dsname string) Datasource {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("http://%v/datasources/name/%v", grafanapi, dsname)
+	data := RequestAUTH("GET", url, []byte(""))
+	var ds Datasource
+	err := json.Unmarshal(data, &ds)
+	if err != nil {
+		fmt.Errorf("Got error %s", err.Error())
+	}
+	return ds
+}
+
+func CreateDatasource(ds Datasource) {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("http://%v/datasources", grafanapi)
+	b, err := json.Marshal(&ds)
+	if err != nil {
+		fmt.Errorf("Got error %s", err.Error())
+	}
+	fmt.Printf("\nCreating %v Grafana Datasource\n", ds.Name)
+	data := RequestAUTH("POST", url, b)
+	fmt.Printf("%v\n", string(data))
+}
+
+func UpdateDatasource(ds Datasource) {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("http://%v/datasources/%v", grafanapi, ds.ID)
+	b, err := json.Marshal(&ds)
+	if err != nil {
+		fmt.Errorf("Got error %s", err.Error())
+	}
+	fmt.Printf("\nUpdate %v Grafana Datasource\n", ds.Name)
+	data := RequestAUTH("PUT", url, b)
+	fmt.Printf("%v\n", string(data))
+}
+
 func RequestAUTH(method, url string, body []byte) []byte {
 	client := &http.Client{
 		Timeout: time.Second * 10,
@@ -102,7 +127,7 @@ func RequestAUTH(method, url string, body []byte) []byte {
 		fmt.Errorf("Got error %s", err.Error())
 	}
 	defer response.Body.Close()
-
+	// read response body
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Errorf("Got error %s", err.Error())
