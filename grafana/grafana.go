@@ -22,6 +22,34 @@ type Datasource struct {
 	} `json:"secureJsonData"`
 }
 
+type Organization struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	Address struct {
+		Address1 string `json:"address1"`
+		Address2 string `json:"address2"`
+		City     string `json:"city"`
+		ZipCode  string `json:"zipCode"`
+		State    string `json:"state"`
+		Country  string `json:"country"`
+	} `json:"address"`
+}
+
+func CreateDatasource() {}
+
+func CreateOrganization() {}
+
+func GetOrganization(orgname string) Organization {
+	url := fmt.Sprintf("http://grafana/api/orgs/name/%v", orgname)
+	data := RequestAUTH(url, "GET")
+	var org Organization
+	err := json.Unmarshal(data, &org)
+	if err != nil {
+		fmt.Errorf("Got error %s", err.Error())
+	}
+	return org
+}
+
 func RequestAUTH(url, method string) []byte {
 	client := &http.Client{
 		Timeout: time.Second * 10,
@@ -45,21 +73,4 @@ func RequestAUTH(url, method string) []byte {
 		fmt.Errorf("Got error %s", err.Error())
 	}
 	return data
-}
-
-func CreateDatasource() {}
-
-func CreateOrganization() {}
-
-func GetOrganizationID(orgname string) string {
-	url := fmt.Sprintf("http://grafana/api/orgs/name/%v", orgname)
-	data := RequestAUTH(url, "GET")
-	var jsonData map[string]interface{}
-	err := json.Unmarshal(data, &jsonData)
-	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
-	}
-
-	id := fmt.Sprintf("%v", jsonData["id"])
-	return id
 }

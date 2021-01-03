@@ -17,9 +17,8 @@ func main() {
 	//Tenant2Proxy()
 
 	//Start the Grafana 2 proxy sync
-	id := grafana.GetOrganizationID("team-alpha-dev")
-	fmt.Printf("%v\n", id)
-	
+	org := grafana.GetOrganization("team-alpha-dev")
+	fmt.Printf("id: %v name: %v\n", org.ID, org.Name)
 }
 
 func Tenant2Proxy() {
