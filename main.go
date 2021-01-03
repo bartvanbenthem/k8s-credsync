@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bartvanbenthem/k8s-credsync/kube"
-	"github.com/bartvanbenthem/k8s-credsync/proxy"
-	"github.com/bartvanbenthem/k8s-credsync/tenant"
+	"github.com/bartvanbenthem/k8s-ntenant-sync/kube"
+	"github.com/bartvanbenthem/k8s-ntenant-sync/proxy"
+	"github.com/bartvanbenthem/k8s-ntenant-sync/tenant"
 )
 
 func main() {

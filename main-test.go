@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bartvanbenthem/k8s-credsync/proxy"
-	"github.com/bartvanbenthem/k8s-credsync/tenant"
+	"github.com/bartvanbenthem/k8s-ntenant-sync/proxy"
+	"github.com/bartvanbenthem/k8s-ntenant-sync/tenant"
 )
 
 func TestGetProxyCredentials() {

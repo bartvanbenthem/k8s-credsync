@@ -3,7 +3,7 @@ package tenant
 import (
 	"os"
 
-	"github.com/bartvanbenthem/k8s-credsync/kube"
+	"github.com/bartvanbenthem/k8s-ntenant-sync/kube"
 	"gopkg.in/yaml.v2"
 )
 
