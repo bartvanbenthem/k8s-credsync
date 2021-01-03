@@ -6,12 +6,23 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bartvanbenthem/k8s-ntenant-sync/grafana"
 	"github.com/bartvanbenthem/k8s-ntenant-sync/kube"
 	"github.com/bartvanbenthem/k8s-ntenant-sync/proxy"
 	"github.com/bartvanbenthem/k8s-ntenant-sync/tenant"
 )
 
 func main() {
+	//Start the tenant 2 proxy sync
+	//Tenant2Proxy()
+
+	//Start the Grafana 2 proxy sync
+	id := grafana.GetOrganizationID("team-alpha-dev")
+	fmt.Printf("%v\n", id)
+	
+}
+
+func Tenant2Proxy() {
 	// Update and collect all current tenant credentials
 	tcreds, err := tenant.AllTenantCredentials()
 	if err != nil {
