@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/bartvanbenthem/k8s-ntenant-sync/grafana"
-	"github.com/bartvanbenthem/k8s-ntenant-sync/kube"
 	"github.com/bartvanbenthem/k8s-ntenant-sync/proxy"
 	"github.com/bartvanbenthem/k8s-ntenant-sync/tenant"
 )
@@ -16,19 +14,30 @@ func main() {
 	//Start the tenant 2 proxy sync
 	//Tenant2Proxy()
 
+	// test by getting the credentials from the current proxy secret
+	//TestGetProxyCredentials()
+
 	//Start the Grafana 2 proxy sync
-	orgs := []string{"team-alpha-dev", "team-beta-test", "team-charlie-test"}
-	for _, org := range orgs {
-		o := grafana.GetOrganization(org)
+	Grafana2Proxy()
+
+}
+func Grafana2Proxy() {
+	// Collect all current proxy credentials
+	pcreds, err := proxy.AllProxyCredentials()
+	if err != nil {
+		log.Printf("\n%v\n")
+	}
+
+	for _, org := range pcreds.Users {
+		o := grafana.GetOrganization(org.Username)
 		if len(o.Name) != 0 {
 			fmt.Printf("id: %v name: %v\n", o.ID, o.Name)
 		} else {
 			fmt.Printf("Organization: %v does not exist\n", org)
-			organization := grafana.Organization{Name: org}
+			organization := grafana.Organization{Name: org.Username}
 			grafana.CreateOrganization(organization)
 		}
 	}
-
 }
 
 func Tenant2Proxy() {
@@ -64,13 +73,12 @@ func Tenant2Proxy() {
 	}
 
 	// update proxy kubernetes secret
-	proxy.ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"), "authn.yaml", pcreds)
+	proxy.ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
+		"authn.yaml", pcreds)
 	// restart proxy
-	RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"), os.Getenv("K8S_PROXY_POD_NAME"))
+	proxy.RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
+		os.Getenv("K8S_PROXY_POD_NAME"))
 	fmt.Printf("\nproxy has been restarted\n")
-
-	// test by getting the credentials from the current proxy and tenant secrets
-	TestGetProxyCredentials()
 }
 
 func Contains(source []string, value string) bool {
@@ -80,17 +88,4 @@ func Contains(source []string, value string) bool {
 		}
 	}
 	return false
-}
-
-func RestartProxy(namespace, podname string) {
-	// initiate kube client
-	var kube kube.KubeCLient
-	// restart proxy pod by deleting pod
-	// the replicaset will create a new pod with updated config
-	pods := kube.GetAllPodNames(kube.CreateClientSet(), namespace)
-	for _, p := range pods {
-		if strings.Contains(p, podname) {
-			kube.DeletePod(kube.CreateClientSet(), namespace, p)
-		}
-	}
 }

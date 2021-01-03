@@ -3,6 +3,7 @@ package proxy
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/bartvanbenthem/k8s-ntenant-sync/kube"
@@ -90,4 +91,17 @@ func AllProxyCredentials() (ProxyCredentials, error) {
 		return proxycred, err
 	}
 	return proxycred, err
+}
+
+func RestartProxy(namespace, podname string) {
+	// initiate kube client
+	var kube kube.KubeCLient
+	// restart proxy pod by deleting pod
+	// the replicaset will create a new pod with updated config
+	pods := kube.GetAllPodNames(kube.CreateClientSet(), namespace)
+	for _, p := range pods {
+		if strings.Contains(p, podname) {
+			kube.DeletePod(kube.CreateClientSet(), namespace, p)
+		}
+	}
 }

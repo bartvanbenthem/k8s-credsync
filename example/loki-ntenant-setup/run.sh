@@ -4,6 +4,7 @@
 kubectl create namespace 'co-monitoring'
 kubectl create namespace 'team-alpha-dev'
 kubectl create namespace 'team-beta-test'
+kubectl create namespace 'team-charlie-test'
 
 # apply the loki multi tenant setup
 kubectl apply -f .
