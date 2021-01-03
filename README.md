@@ -12,7 +12,13 @@ Synchronise credentials for all tenants with the authentication proxy and grafan
 * The Tenant username should always be identical with the tenant namespace name.
 * The multi tenant auth proxy needs to be restarted after secret data update.
 
-## Set environment variables
+## Install and run
+```shell
+$ git clone https://github.com/bartvanbenthem/k8s-ntenant-sync.git
+$ kubectl apply -f k8s-ntenant-sync/build/loki-ntenant-setup/.
+```
+
+### Set environment variables
 ```shell
 export K8S_KUBECONFIG='/var/snap/microk8s/current/credentials/client.config'
 export K8S_PROXY_SECRET_NAME='loki-multi-tenant-proxy-auth-config'
@@ -25,9 +31,8 @@ export K8S_GRAFANA_BA_USER='admin'
 export K8S_GRAFANA_BA_PASSWORD='prom-operator'
 export K8S_GRAFANA_API_URL='grafana/api'
 ```
-## Run Sync services
+### Start sync services
 ```shell
-$ git clone https://github.com/bartvanbenthem/k8s-ntenant-sync.git
 $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 ```
 
