@@ -1,5 +1,5 @@
 # k8s-ntenant-sync
-Synchronise basic auth credentials for all tenants with the authentication proxy 
+Synchronise credentials for all tenants with the authentication proxy and grafana datasource.
 
 ### min requirements teant2proxy sync
 * the tenant secret name to scan is set with an environment variable. 
