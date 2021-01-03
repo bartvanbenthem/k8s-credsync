@@ -5,7 +5,7 @@ Synchronise credentials for all tenants with the authentication proxy and grafan
 * go-client sdk is used to interract with the kubernetes API
 * a kubernetes service account is used to athenticate and authorize the credsync service
 
-### teant2proxy sync
+### tenant2proxy sync
 * the tenant secret name to scan is set with an environment variable. 
 * there is one tenant secret per namespace to scan.
 * the tenant user-name should always be identical with the tenant namespace name.
