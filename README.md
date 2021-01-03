@@ -1,7 +1,7 @@
-# k8s-ntenant-credsync
+# k8s-ntenant-sync
 Synchronise basic auth credentials for all tenants with the authentication proxy 
 
-### min requirements credsync
+### min requirements teant2proxy sync
 * the tenant secret name to scan is set with an environment variable. 
 * there is one tenant secret per namespace to scan.
 * the tenant user-name should always be identical with the tenant namespace name.
