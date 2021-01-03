@@ -17,8 +17,15 @@ func main() {
 	//Tenant2Proxy()
 
 	//Start the Grafana 2 proxy sync
-	org := grafana.GetOrganization("team-alpha-dev")
-	fmt.Printf("id: %v name: %v\n", org.ID, org.Name)
+	orgs := []string{"team-alpha-dev", "team-beta-test", "team-charlie-test"}
+	for _, org := range orgs {
+		o := grafana.GetOrganization(org)
+		if len(o.Name) != 0 {
+			fmt.Printf("id: %v name: %v\n", o.ID, o.Name)
+		} else {
+			fmt.Printf("name: %v does not exist\n", org)
+		}
+	}
 }
 
 func Tenant2Proxy() {
