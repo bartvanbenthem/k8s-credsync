@@ -47,7 +47,7 @@ $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 * create a function that checks if a kubernetes resource object exists to replace temp wait func.
 ---
 * expose both sync functions through two API endpoints (net/http).
-* create a build to run the service on kubernetes.
+* create a build w docker container to run the service on kubernetes.
 * when a tenant password does not match the auth-proxy password, the auth proxy and datasource passwords are updated.
 * Update Organization ID in the Proxy config after generating an Grafana Organization ID.
 
