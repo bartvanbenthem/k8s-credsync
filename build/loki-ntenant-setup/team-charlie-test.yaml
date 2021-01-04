@@ -98,7 +98,7 @@ spec:
       - name: kail
         image: abozanich/kail:v0.15.0
         command: ["/bin/sh"]
-        args: ["-c", "/kail --log-file /loki/logs/kail --log-level debug --ns team-charlie-test >> /loki/logs/containers"]
+        args: ["-c", "/kail --log-file /loki/logs/kail --log-level debug --ns ${NAMESPACE} >> /loki/logs/containers"]
         env:
         - name: NAMESPACE
           valueFrom:
