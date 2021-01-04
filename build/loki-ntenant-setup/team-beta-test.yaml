@@ -1,4 +1,56 @@
 apiVersion: v1
+kind: Secret
+metadata:
+  name: log-recolector-config
+  namespace: team-beta-test
+stringData:
+  promtail.yaml:  |
+    server:
+      http_listen_port: 9080
+      grpc_listen_port: 0
+    client:
+      url: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100/api/prom/push
+      basic_auth:
+        username: team-beta-test
+        password: bbGT23234bbg346grg
+    scrape_configs:
+      - job_name: containers
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: containers
+              __path__: /loki/logs/containers
+        pipeline_stages:
+        - regex:
+            expression: '^(?P<namespace>.*)\/(?P<pod>.*)\[(?P<container>.*)\]: (?P<content>.*)'
+        - labels:
+            namespace:
+            pod:
+            container:
+        - output:
+            source: content
+      - job_name: kail
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: kail
+              __path__: /loki/logs/kail
+        pipeline_stages:
+        - regex:
+            expression: '^time="(?P<time>.*)" level=(?P<level>.*) msg="(?P<content>.*)" cmp=(?P<component>.*)'
+        - labels:
+            time:
+            level:
+            component:
+        - timestamp:
+            source: time
+            format: RFC3339
+        - output:
+            source: content
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: log-recolector
@@ -44,11 +96,14 @@ spec:
           secretName: log-recolector-config
       containers:
       - name: kail
-        image: angelbarrera92/kail:0.12
-        args:
-          - "/bin/sh"
-          - "-c"
-          - "kail --log-file /loki/logs/kail --log-level debug --ns team-beta-test >> /loki/logs/containers"
+        image: abozanich/kail:v0.15.0
+        command: ["/bin/sh"]
+        args: ["-c", "/kail --log-file /loki/logs/kail --log-level debug --ns team-beta-test >> /loki/logs/containers"]
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         volumeMounts:
         - name: shared-data
           mountPath: /loki/logs
@@ -61,74 +116,4 @@ spec:
           mountPath: /loki/logs
         - name: promtail-config
           mountPath: /etc/promtail
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: log-recolector-config
-  namespace: team-beta-test
-stringData:
-  promtail.yaml:  |
-    server:
-      http_listen_port: 9080
-      grpc_listen_port: 0
-    client:
-      url: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100/api/prom/push
-      basic_auth:
-        username: team-beta-test
-        password: BBBAssD444D345s555g988N
-    scrape_configs:
-      - job_name: containers
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: containers
-              __path__: /loki/logs/containers
-        pipeline_stages:
-        - regex:
-            expression: '^(?P<namespace>.*)\/(?P<pod>.*)\[(?P<container>.*)\]: (?P<content>.*)'
-        - labels:
-            namespace:
-            pod:
-            container:
-        - output:
-            source: content
-      - job_name: kail
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: kail
-              __path__: /loki/logs/kail
-        pipeline_stages:
-        - regex:
-            expression: '^time="(?P<time>.*)" level=(?P<level>.*) msg="(?P<content>.*)" cmp=(?P<component>.*)'
-        - labels:
-            time:
-            level:
-            component:
-        - timestamp:
-            source: time
-            format: RFC3339
-        - output:
-            source: content
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: counter
-  namespace: team-beta-test
-spec:
-  containers:
-  - name: count
-    image: busybox
-    args: [/bin/sh, -c,
-            'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done']
-    resources:
-      requests:
-        memory: "10Mi"
-        cpu: "5m"
-      limits:
-        memory: "10Mi"
-        cpu: "5m"
+

@@ -3,6 +3,7 @@ Synchronise credentials for all tenants with the authentication proxy and grafan
 
 ### technical choices
 * github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
+* github.com/boz/kail is used for log streaming matched pods.
 * go-client sdk is used to interract with the kubernetes API.
 * A custom rest client with basic auth is used to interract with the Grafana API.
 * A Kubernetes service account is used to athenticate and authorize the ntenant-sync service.
