@@ -6,7 +6,6 @@ Synchronise credentials for all tenants with the authentication proxy and grafan
 * github.com/boz/kail is used for log streaming.
 * go-client sdk is used to interract with the kubernetes API.
 * A custom rest client with basic auth is used to interract with the Grafana API.
-* A Kubernetes service account is used to athenticate and authorize the ntenant-sync service.
 * Environment variables are set for dynamic configuration parameters.
 
 ### technical requirements
