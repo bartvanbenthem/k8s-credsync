@@ -50,3 +50,4 @@ $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 * when a tenant password does not match the auth-proxy password, the auth proxy and datasource passwords are updated.
 * Update Organization ID in the Proxy config after generating an Grafana Organization ID.
 
+
