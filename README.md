@@ -3,10 +3,9 @@ Synchronise credentials for all tenants with the authentication proxy and grafan
 
 ### technical choices
 * github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
-* github.com/boz/kail is used for log streaming matched pods.
+* github.com/boz/kail is used for log streaming.
 * go-client sdk is used to interract with the kubernetes API.
 * A custom rest client with basic auth is used to interract with the Grafana API.
-* A Kubernetes service account is used to athenticate and authorize the ntenant-sync service.
 * Environment variables are set for dynamic configuration parameters.
 
 ### technical requirements
@@ -46,7 +45,7 @@ $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 * Make Grafana API requests TLS compatible.
 * create a function that checks if a kubernetes resource object exists to replace temp wait func.
 ---
-* expose both sync functions through two API endpoints (net/http).
+* expose sync functions through two API endpoints (net/http).
 * create a build w docker container to run the service on kubernetes.
 * when a tenant password does not match the auth-proxy password, the auth proxy and datasource passwords are updated.
 * Update Organization ID in the Proxy config after generating an Grafana Organization ID.
