@@ -72,7 +72,7 @@ func Grafana2Proxy() {
 	for _, p := range pcreds.Users {
 		o := grafana.GetOrganization(p.Username)
 		if len(o.Name) != 0 {
-			fmt.Printf("id: %v name: %v\n", o.ID, o.Name)
+			fmt.Printf("\nid: %v name: %v\n", o.ID, o.Name)
 		} else {
 			fmt.Printf("Organization: %v does not exist\n", p)
 			organization := grafana.Organization{Name: p.Username}

@@ -7,10 +7,10 @@ metadata:
     app: loki-multi-tenant-proxy
 stringData:
   authn.yaml: |-
-    users:
-      - username: example
-        password: example
-        orgid: example
+    users: []
+      #- username: example
+      #  password: example
+      #  orgid: example
 ---
 apiVersion: v1
 kind: Service
