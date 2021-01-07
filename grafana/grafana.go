@@ -2,6 +2,8 @@ package grafana
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -38,9 +40,15 @@ type Organization struct {
 	} `json:"address"`
 }
 
+var (
+	certFile = os.Getenv("K8S_GRAFANA_CERT_FILE")
+	keyFile  = os.Getenv("K8S_GRAFANA_KEY_FILE")
+	caFile   = os.Getenv("K8S_GRAFANA_CA_FILE")
+)
+
 func SwitchUserContext(org Organization) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/user/using/%v", grafanapi, org.ID)
+	url := fmt.Sprintf("%v/user/using/%v", grafanapi, org.ID)
 	o, err := json.Marshal(&org)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
@@ -52,7 +60,7 @@ func SwitchUserContext(org Organization) {
 
 func GetOrganization(orgname string) Organization {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/orgs/name/%v", grafanapi, orgname)
+	url := fmt.Sprintf("%v/orgs/name/%v", grafanapi, orgname)
 	data := RequestAUTH("GET", url, []byte(""))
 	var org Organization
 	err := json.Unmarshal(data, &org)
@@ -64,7 +72,7 @@ func GetOrganization(orgname string) Organization {
 
 func CreateOrganization(org Organization) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/orgs", grafanapi)
+	url := fmt.Sprintf("%v/orgs", grafanapi)
 	b, err := json.Marshal(&org)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
@@ -76,7 +84,7 @@ func CreateOrganization(org Organization) {
 
 func GetDatasource(dsname string) Datasource {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/datasources/name/%v", grafanapi, dsname)
+	url := fmt.Sprintf("%v/datasources/name/%v", grafanapi, dsname)
 	data := RequestAUTH("GET", url, []byte(""))
 	var ds Datasource
 	err := json.Unmarshal(data, &ds)
@@ -88,7 +96,7 @@ func GetDatasource(dsname string) Datasource {
 
 func CreateDatasource(ds Datasource) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/datasources", grafanapi)
+	url := fmt.Sprintf("%v/datasources", grafanapi)
 	b, err := json.Marshal(&ds)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
@@ -100,7 +108,7 @@ func CreateDatasource(ds Datasource) {
 
 func UpdateDatasource(ds Datasource) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("http://%v/datasources/%v", grafanapi, ds.ID)
+	url := fmt.Sprintf("%v/datasources/%v", grafanapi, ds.ID)
 	b, err := json.Marshal(&ds)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
@@ -111,10 +119,38 @@ func UpdateDatasource(ds Datasource) {
 }
 
 func RequestAUTH(method, url string, body []byte) []byte {
-	client := &http.Client{
-		Timeout: time.Second * 10,
+	caFile := os.Getenv("K8S_GRAFANA_CA_FILE")
+	var err error
+	var client *http.Client
+	var req *http.Request
+	if len(caFile) == 0 {
+		client = &http.Client{
+			Timeout: time.Second * 10,
+		}
+		url := fmt.Sprintf("http://%v", url)
+		req, err = http.NewRequest(method, url,
+			bytes.NewBuffer(body))
+	} else {
+		caCert, err := ioutil.ReadFile(caFile)
+		if err != nil {
+			log.Printf("FATAL ERROR: %v\n", err)
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: caCertPool,
+					// InsecureSkipVerify: true
+				},
+			},
+		}
+		tls := fmt.Sprintf("https://%v", url)
+		req, err = http.NewRequest(method, tls,
+			bytes.NewBuffer(body))
 	}
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
+
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		log.Printf("%v\n", err)
