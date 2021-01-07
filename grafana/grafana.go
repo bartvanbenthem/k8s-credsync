@@ -40,12 +40,6 @@ type Organization struct {
 	} `json:"address"`
 }
 
-var (
-	certFile = os.Getenv("K8S_GRAFANA_CERT_FILE")
-	keyFile  = os.Getenv("K8S_GRAFANA_KEY_FILE")
-	caFile   = os.Getenv("K8S_GRAFANA_CA_FILE")
-)
-
 func SwitchUserContext(org Organization) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/user/using/%v", grafanapi, org.ID)
