@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -24,12 +23,12 @@ func Tenant2Proxy() {
 	// Update and collect all current tenant credentials
 	tcreds, err := tenant.AllTenantCredentials()
 	if err != nil {
-		log.Printf("\n%v\n")
+		log.Printf("%v\n", err)
 	}
 	// Update and collect all current proxy credentials
 	pcreds, err := proxy.AllProxyCredentials()
 	if err != nil {
-		log.Printf("\n%v\n")
+		log.Printf("%v\n", err)
 	}
 
 	// create a slice with all the tenant usernames
@@ -58,23 +57,24 @@ func Tenant2Proxy() {
 	// restart proxy
 	proxy.RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		os.Getenv("K8S_PROXY_POD_NAME"))
-	fmt.Printf("\nproxy has been restarted\n")
+	log.Printf("Proxy \"%v\" has been restarted\n",
+		os.Getenv("K8S_PROXY_POD_NAME"))
 }
 
 func Grafana2Proxy() {
 	// Collect all current proxy credentials
 	pcreds, err := proxy.AllProxyCredentials()
 	if err != nil {
-		log.Printf("\n%v\n")
+		log.Printf("%v\n", err)
 	}
 
 	// Scan and Create Organizations
 	for _, p := range pcreds.Users {
 		o := grafana.GetOrganization(p.Username)
 		if len(o.Name) != 0 {
-			fmt.Printf("\nid: %v name: %v\n", o.ID, o.Name)
+			log.Printf("id: \"%v\" name: \"%v\" \n", o.ID, o.Name)
 		} else {
-			fmt.Printf("Organization: %v does not exist\n", p)
+			log.Printf("Organization \"%v\" does not exist\n", p)
 			organization := grafana.Organization{Name: p.Username}
 			grafana.CreateOrganization(organization)
 		}
@@ -84,7 +84,7 @@ func Grafana2Proxy() {
 	for _, p := range pcreds.Users {
 		o := grafana.GetOrganization(p.Username)
 		if len(o.Name) == 0 {
-			fmt.Printf("Error: Organization %v Cannot be found\n", p.Username)
+			log.Printf("Organization \"%v\" Cannot be found\n", p.Username)
 		}
 		ds := grafana.GetDatasource(p.Username)
 		var datasource grafana.Datasource
@@ -97,7 +97,7 @@ func Grafana2Proxy() {
 		datasource.BasicAuthUser = p.Username
 		datasource.SecureJSONData.BasicAuthPassword = p.Password
 		if len(ds.Name) != 0 {
-			fmt.Printf("Datasource %v exists\n", ds.Name)
+			log.Printf("Datasource \"%v\" already exists\n", ds.Name)
 		} else {
 			// switch the user context to the correct organization
 			grafana.SwitchUserContext(o)
@@ -105,7 +105,7 @@ func Grafana2Proxy() {
 			grafana.CreateDatasource(datasource)
 		}
 	}
-	fmt.Printf("\nGrafana Orgs and Datasources are in sync\n")
+	log.Printf("Grafana Organizations and Datasources are in sync\n")
 }
 
 func Contains(source []string, value string) bool {

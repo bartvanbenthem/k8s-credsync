@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -44,7 +45,7 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 
 	credbyte, err := yaml.Marshal(&newc)
 	if err != nil {
-		fmt.Printf("\nerror encoding yaml: %v\n", err)
+		log.Printf("Error encoding yaml: %v\n", err)
 	}
 
 	sec := kube.GetSecret(kube.CreateClientSet(), namespace, proxysec)
@@ -68,6 +69,7 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 	// create secret
 	_ = kube.CreateSecret(kube.CreateClientSet(), namespace, &newsecret)
 
+	// get/validate secret
 	_ = kube.GetSecret(kube.CreateClientSet(), namespace, newsecret.Name)
 	if err != nil {
 		fmt.Printf("%v\n", err)

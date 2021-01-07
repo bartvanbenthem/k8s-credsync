@@ -12,7 +12,7 @@ func TestGetProxyCredentials() {
 	// Prints the current proxycredentials
 	pcurrent, err := proxy.AllProxyCredentials()
 	if err != nil {
-		log.Printf("\n%v\n")
+		log.Printf("%v\n", err)
 	}
 	fmt.Printf("\nProxy\n-----\n")
 	for _, pc := range pcurrent.Users {
@@ -35,7 +35,7 @@ func TestMainFunctions() {
 	// Prints the current proxycredentials
 	pcurrent, err := proxy.AllProxyCredentials()
 	if err != nil {
-		log.Printf("\n%v\n")
+		log.Printf("%v\n", err)
 	}
 	fmt.Printf("\nProxy\n-----\n")
 	for _, pc := range pcurrent.Users {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -42,11 +43,11 @@ func SwitchUserContext(org Organization) {
 	url := fmt.Sprintf("http://%v/user/using/%v", grafanapi, org.ID)
 	o, err := json.Marshal(&org)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("Error encoding yaml %v", err)
 	}
-	fmt.Printf("\nSwitching to %v Organization\n", org.Name)
+	log.Printf("Switching context to %v Organization\n", org.Name)
 	data := RequestAUTH("POST", url, o)
-	fmt.Printf("%v\n", string(data))
+	log.Printf("%v\n", string(data))
 }
 
 func GetOrganization(orgname string) Organization {
@@ -56,7 +57,7 @@ func GetOrganization(orgname string) Organization {
 	var org Organization
 	err := json.Unmarshal(data, &org)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("Error encoding yaml %v", err)
 	}
 	return org
 }
@@ -66,11 +67,11 @@ func CreateOrganization(org Organization) {
 	url := fmt.Sprintf("http://%v/orgs", grafanapi)
 	b, err := json.Marshal(&org)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("Error encoding yaml %v", err)
 	}
-	fmt.Printf("\nCreating %v Grafana Organization\n", org.Name)
+	log.Printf("Create \"%v\" Grafana Organization\n", org.Name)
 	data := RequestAUTH("POST", url, b)
-	fmt.Printf("%v\n", string(data))
+	log.Printf("%v\n", string(data))
 }
 
 func GetDatasource(dsname string) Datasource {
@@ -80,7 +81,7 @@ func GetDatasource(dsname string) Datasource {
 	var ds Datasource
 	err := json.Unmarshal(data, &ds)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("Error encoding yaml %v", err)
 	}
 	return ds
 }
@@ -90,11 +91,11 @@ func CreateDatasource(ds Datasource) {
 	url := fmt.Sprintf("http://%v/datasources", grafanapi)
 	b, err := json.Marshal(&ds)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("Error encoding yaml %v", err)
 	}
-	fmt.Printf("\nCreating %v Grafana Datasource\n", ds.Name)
+	log.Printf("Create \"%v\" Grafana Datasource\n", ds.Name)
 	data := RequestAUTH("POST", url, b)
-	fmt.Printf("%v\n", string(data))
+	log.Printf("%v\n", string(data))
 }
 
 func UpdateDatasource(ds Datasource) {
@@ -102,11 +103,11 @@ func UpdateDatasource(ds Datasource) {
 	url := fmt.Sprintf("http://%v/datasources/%v", grafanapi, ds.ID)
 	b, err := json.Marshal(&ds)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("Error encoding yaml %v", err)
 	}
-	fmt.Printf("\nUpdate %v Grafana Datasource\n", ds.Name)
+	log.Printf("\nUpdate \"%v\" Grafana Datasource\n", ds.Name)
 	data := RequestAUTH("PUT", url, b)
-	fmt.Printf("%v\n", string(data))
+	log.Printf("%v\n", string(data))
 }
 
 func RequestAUTH(method, url string, body []byte) []byte {
@@ -116,21 +117,22 @@ func RequestAUTH(method, url string, body []byte) []byte {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("%v\n", err)
 	}
 	// import grafana credentials from environment var
+	// needed for basic authentication
 	user := os.Getenv("K8S_GRAFANA_BA_USER")
 	pass := os.Getenv("K8S_GRAFANA_BA_PASSWORD")
 	req.SetBasicAuth(user, pass)
 	response, err := client.Do(req)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("%v\n", err)
 	}
 	defer response.Body.Close()
 	// read response body
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Errorf("Got error %s", err.Error())
+		log.Printf("%v\n", err)
 	}
 	return data
 }
