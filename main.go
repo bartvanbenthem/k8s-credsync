@@ -12,9 +12,6 @@ import (
 func main() {
 	//Start the tenant 2 proxy sync
 	Tenant2Proxy()
-	// test by getting the credentials from the current proxy secret
-	//TestGetProxyCredentials()
-
 	//Start the Grafana 2 proxy sync
 	Grafana2Proxy()
 }
@@ -72,7 +69,7 @@ func Grafana2Proxy() {
 	for _, p := range pcreds.Users {
 		o := grafana.GetOrganization(p.Username)
 		if len(o.Name) != 0 {
-			log.Printf("id: \"%v\" name: \"%v\" \n", o.ID, o.Name)
+			log.Printf("Organization \"%v\" exists with ID \"%v\"\n", o.Name, o.ID)
 		} else {
 			log.Printf("Organization \"%v\" does not exist\n", p)
 			organization := grafana.Organization{Name: p.Username}
@@ -105,7 +102,7 @@ func Grafana2Proxy() {
 			grafana.CreateDatasource(datasource)
 		}
 	}
-	log.Printf("Grafana Organizations and Datasources are in sync\n")
+	log.Printf("Grafana Organizations and Datasources are synced\n")
 }
 
 func Contains(source []string, value string) bool {

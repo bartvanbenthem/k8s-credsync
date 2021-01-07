@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -72,7 +71,7 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 	// get/validate secret
 	_ = kube.GetSecret(kube.CreateClientSet(), namespace, newsecret.Name)
 	if err != nil {
-		fmt.Printf("%v\n", err)
+		log.Printf("%v\n", err)
 	}
 }
 
@@ -84,7 +83,6 @@ func AllProxyCredentials() (ProxyCredentials, error) {
 	proxyns := os.Getenv("K8S_PROXY_SECRET_NAMESPACE")
 	// initiate kube client
 	var kube kube.KubeCLient
-
 	// get the proxy credentials
 	proxycred, err := GetProxyCredentials(string(
 		kube.GetSecretData(kube.CreateClientSet(),

@@ -15,5 +15,9 @@ export K8S_GRAFANA_BA_USER='admin'
 export K8S_GRAFANA_BA_PASSWORD='prom-operator'
 export K8S_GRAFANA_API_URL='grafana/api'
 
+# create build
+go build .
+mv -f k8s-ntenant-sync build/bin/
+
 # run ntenant-sync binary
-./bin/k8s-ntenant-sync
+./build/bin/k8s-ntenant-sync

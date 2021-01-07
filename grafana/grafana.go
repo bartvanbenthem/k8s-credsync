@@ -43,7 +43,7 @@ func SwitchUserContext(org Organization) {
 	url := fmt.Sprintf("http://%v/user/using/%v", grafanapi, org.ID)
 	o, err := json.Marshal(&org)
 	if err != nil {
-		log.Printf("Error encoding yaml %v", err)
+		log.Printf("Error encoding yaml: %v", err)
 	}
 	log.Printf("Switching context to %v Organization\n", org.Name)
 	data := RequestAUTH("POST", url, o)
@@ -57,7 +57,7 @@ func GetOrganization(orgname string) Organization {
 	var org Organization
 	err := json.Unmarshal(data, &org)
 	if err != nil {
-		log.Printf("Error encoding yaml %v", err)
+		log.Printf("Error encoding yaml: %v", err)
 	}
 	return org
 }
@@ -67,7 +67,7 @@ func CreateOrganization(org Organization) {
 	url := fmt.Sprintf("http://%v/orgs", grafanapi)
 	b, err := json.Marshal(&org)
 	if err != nil {
-		log.Printf("Error encoding yaml %v", err)
+		log.Printf("Error encoding yaml: %v", err)
 	}
 	log.Printf("Create \"%v\" Grafana Organization\n", org.Name)
 	data := RequestAUTH("POST", url, b)
@@ -81,7 +81,7 @@ func GetDatasource(dsname string) Datasource {
 	var ds Datasource
 	err := json.Unmarshal(data, &ds)
 	if err != nil {
-		log.Printf("Error encoding yaml %v", err)
+		log.Printf("Error encoding yaml: %v", err)
 	}
 	return ds
 }
@@ -91,7 +91,7 @@ func CreateDatasource(ds Datasource) {
 	url := fmt.Sprintf("http://%v/datasources", grafanapi)
 	b, err := json.Marshal(&ds)
 	if err != nil {
-		log.Printf("Error encoding yaml %v", err)
+		log.Printf("Error encoding yaml: %v", err)
 	}
 	log.Printf("Create \"%v\" Grafana Datasource\n", ds.Name)
 	data := RequestAUTH("POST", url, b)
@@ -103,7 +103,7 @@ func UpdateDatasource(ds Datasource) {
 	url := fmt.Sprintf("http://%v/datasources/%v", grafanapi, ds.ID)
 	b, err := json.Marshal(&ds)
 	if err != nil {
-		log.Printf("Error encoding yaml %v", err)
+		log.Printf("Error encoding yaml: %v", err)
 	}
 	log.Printf("\nUpdate \"%v\" Grafana Datasource\n", ds.Name)
 	data := RequestAUTH("PUT", url, b)
