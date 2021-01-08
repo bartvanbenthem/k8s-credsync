@@ -135,8 +135,8 @@ func RequestAUTH(method, url string, body []byte) []byte {
 		client = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
-					RootCAs: caCertPool,
-					// InsecureSkipVerify: true
+					RootCAs:            caCertPool,
+					InsecureSkipVerify: true, // enable for self signed certificates
 				},
 			},
 		}
