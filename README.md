@@ -42,7 +42,6 @@ $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 ```
 
 # TODO
-* Make Grafana API requests TLS compatible.
 * create a function that checks if a kubernetes resource object exists to replace temp wait func.
 ---
 * expose sync functions through two API endpoints (net/http).
