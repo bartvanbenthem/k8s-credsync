@@ -34,7 +34,8 @@ export K8S_PROXY_URL_PORT='http://loki-multi-tenant-proxy.co-monitoring.svc.clus
 
 export K8S_GRAFANA_BA_USER='admin'
 export K8S_GRAFANA_BA_PASSWORD='prom-operator'
-export K8S_GRAFANA_API_URL='grafana/api'
+export K8S_GRAFANA_API_URL='grafanatls/api'
+export K8S_GRAFANA_CA_FILE='build/cert/rootCA.crt'
 ```
 ### Start sync services
 ```shell
