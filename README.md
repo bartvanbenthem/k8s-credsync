@@ -36,6 +36,10 @@ export K8S_GRAFANA_BA_USER='admin'
 export K8S_GRAFANA_BA_PASSWORD='prom-operator'
 export K8S_GRAFANA_API_URL='grafanatls/api'
 export K8S_GRAFANA_CA_FILE='build/cert/rootCA.crt'
+
+export K8S_SERVER_ADDRESS=':8443'
+export K8S_SERVER_CERT='build/cert/server/server.pem'
+export K8S_SERVER_KEY='build/cert/server/server.key'
 ```
 ### Start sync services
 ```shell
