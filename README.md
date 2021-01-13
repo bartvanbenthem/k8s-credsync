@@ -41,6 +41,7 @@ export K8S_SERVER_ADDRESS=':8443'
 export K8S_SERVER_CERT='build/cert/server/server.pem'
 export K8S_SERVER_KEY='build/cert/server/server.key'
 ```
+
 ### Start sync services
 ```shell
 $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
@@ -49,7 +50,7 @@ $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 # TODO
 * Design and create a function that checks if a kubernetes resource object exists to replace temp wait func.
 * Design and create a server thats exposes the sync functions through API endpoints (net/http).
-* Build the loki-multi-tenant-proxy and Kail containers from source.
+* Build the loki-multi-tenant-proxy and Kail containers from source code.
 * Design and transform the current build to a kubernetes native build including monitoring.
 * Design and create a function for snapshotting the proxy secret before change trough the sync functions.
 * Design and create a update function only for the passwords.
