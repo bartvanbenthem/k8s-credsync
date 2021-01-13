@@ -53,6 +53,5 @@ $ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
 * Design and transform the current build to a kubernetes native build including monitoring.
 * Design and create a function for snapshotting the proxy secret before change trough the sync functions.
 * Design and create a update function only for the passwords.
-* Design and create a function that updates the OrganizationID in the Proxy secret with the generated Grafana OrganizationID.
 
 
