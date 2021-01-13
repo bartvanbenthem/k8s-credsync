@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/bartvanbenthem/k8s-ntenant-sync/proxy"
-	"github.com/bartvanbenthem/k8s-ntenant-sync/tenant"
+	"github.com/bartvanbenthem/k8s-ntenant/proxy"
+	"github.com/bartvanbenthem/k8s-ntenant/tenant"
 )
 
 func Contains(source []string, value string) bool {

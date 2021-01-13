@@ -22,7 +22,7 @@ export K8S_SERVER_KEY='build/cert/server/server.key'
 
 # create build
 go build .
-mv -f k8s-ntenant-sync build/bin/
+mv -f k8s-ntenant build/bin/
 
 # run ntenant-sync binary
-./build/bin/k8s-ntenant-sync
+./build/bin/k8s-ntenant

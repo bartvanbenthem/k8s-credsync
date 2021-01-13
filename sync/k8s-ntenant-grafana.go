@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/bartvanbenthem/k8s-ntenant-sync/grafana"
-	"github.com/bartvanbenthem/k8s-ntenant-sync/proxy"
+	"github.com/bartvanbenthem/k8s-ntenant/grafana"
+	"github.com/bartvanbenthem/k8s-ntenant/proxy"
 )
 
 func Grafana2Proxy() {

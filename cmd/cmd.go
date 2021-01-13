@@ -1,6 +1,6 @@
 package main
 
-import "github.com/bartvanbenthem/k8s-ntenant-sync/sync"
+import "github.com/bartvanbenthem/k8s-ntenant/sync"
 
 func main() {
 	//Start the tenant 2 proxy sync

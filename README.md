@@ -17,9 +17,9 @@ Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
 ## Install and run
 ```shell
-$ git clone https://github.com/bartvanbenthem/k8s-ntenant-sync.git
+$ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
 # deploy Loki and proxy for a multi-tenant logging setup
-$ cd k8s-ntenant-sync/build/loki-ntenant-setup/
+$ cd k8s-ntenant/build/loki-ntenant-setup/
 $ ./deploy.sh
 ```
 
@@ -44,7 +44,7 @@ export K8S_SERVER_KEY='build/cert/server/server.key'
 
 ### Start sync services
 ```shell
-$ ./k8s-ntenant-sync/bin/k8s-ntenant-sync
+$ ./k8s-ntenant/bin/k8s-ntenant
 ```
 
 # TODO
