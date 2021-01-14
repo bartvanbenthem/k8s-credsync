@@ -1,5 +1,5 @@
 # k8s-ntenant
-Multi tenant monitoring and logging solution with credential synchronization on the authentication proxies and grafana datasource configurations. Grafana Organizations and Datasources will be provisioned and configured automatically in a multi tenancy setup.
+Multi tenant monitoring and logging solution with credential synchronization on the authentication proxies and grafana datasource configurations. Grafana Organizations and Datasources will be provisioned and configured automatically in a multi tenant setup.
 
 ### technical choices
 * github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
