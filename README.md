@@ -23,7 +23,7 @@ $ cd k8s-ntenant/build/loki-ntenant-setup/
 $ ./deploy.sh
 ```
 
-### Set environment variables
+#### Set environment variables
 ```shell
 export K8S_KUBECONFIG='/var/snap/microk8s/current/credentials/client.config'
 export K8S_PROXY_SECRET_NAME='loki-multi-tenant-proxy-auth-config'
@@ -42,9 +42,14 @@ export K8S_SERVER_CERT='build/cert/server/server.pem'
 export K8S_SERVER_KEY='build/cert/server/server.key'
 ```
 
-### Run sync services binary
+#### Run sync services binary
 ```shell
 $ ./k8s-ntenant/build/bin/cmd
+```
+or
+#### Run sync services server
+```shell
+$ ./k8s-ntenant/build/bin/k8s-ntenant
 ```
 
 # TODO
