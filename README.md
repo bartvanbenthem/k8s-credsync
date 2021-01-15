@@ -42,9 +42,9 @@ export K8S_SERVER_CERT='build/cert/server/server.pem'
 export K8S_SERVER_KEY='build/cert/server/server.key'
 ```
 
-### Start sync services
+### Run sync services binary
 ```shell
-$ ./k8s-ntenant/bin/k8s-ntenant
+$ ./k8s-ntenant/build/bin/cmd
 ```
 
 # TODO
