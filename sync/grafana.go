@@ -65,6 +65,6 @@ func Grafana() {
 	if err == nil {
 		log.Printf("Grafana synchronization finished without errors")
 	} else {
-		log.Printf("Grafana synchronization finished with errors check log")
+		log.Printf("Grafana synchronization finished with errors inspect log")
 	}
 }

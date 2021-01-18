@@ -50,7 +50,7 @@ func Proxy() {
 	}
 
 	// update proxy kubernetes secret
-	proxy.ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
+	err = proxy.ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		"authn.yaml", pcreds)
 	// restart proxy
 	proxy.RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
@@ -61,6 +61,6 @@ func Proxy() {
 	if err == nil {
 		log.Printf("Proxy synchronization finished without errors")
 	} else {
-		log.Printf("Proxy synchronization finished with errors check log")
+		log.Printf("Proxy synchronization finished with errors inspect log")
 	}
 }

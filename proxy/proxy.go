@@ -37,7 +37,7 @@ func GetProxyCredentials(file string) (ProxyCredentials, error) {
 	return c, err
 }
 
-func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
+func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) error {
 	// import required environment variables
 	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
 	var kube kube.KubeCLient
@@ -45,6 +45,7 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 	credbyte, err := yaml.Marshal(&newc)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v\n", err)
+		return err
 	}
 
 	sec := kube.GetSecret(kube.CreateClientSet(), namespace, proxysec)
@@ -67,12 +68,13 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) {
 
 	// create secret
 	_ = kube.CreateSecret(kube.CreateClientSet(), namespace, &newsecret)
-
 	// get/validate secret
 	_ = kube.GetSecret(kube.CreateClientSet(), namespace, newsecret.Name)
 	if err != nil {
 		log.Printf("%v\n", err)
+		return err
 	}
+	return err
 }
 
 // collects all proxy credentials
