@@ -54,7 +54,6 @@ $ ./k8s-ntenant/build/bin/cmd
 
 # TODO
 * Design and create a function that checks if a kubernetes resource object exists to replace temp wait func.
-* Design and create a server thats exposes the sync functions through API endpoints (net/http).
 * Build the loki-multi-tenant-proxy and Kail containers from source code.
 * Design and transform the current build to a kubernetes native build including monitoring.
 * Design and create a function for snapshotting the proxy secret before change trough the sync functions.
