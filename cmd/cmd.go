@@ -1,10 +1,20 @@
 package main
 
-import "github.com/bartvanbenthem/k8s-ntenant/sync"
+import (
+	"log"
+
+	"github.com/bartvanbenthem/k8s-ntenant/sync"
+)
 
 func main() {
 	//Start the tenant 2 proxy sync
-	sync.Proxy()
+	err := sync.Proxy()
+	if err != nil {
+		log.Printf("%v\n", err)
+	}
 	//Start the Grafana 2 proxy sync
-	sync.Grafana()
+	err = sync.Grafana()
+	if err != nil {
+		log.Printf("%v\n", err)
+	}
 }
