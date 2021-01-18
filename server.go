@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/bartvanbenthem/k8s-ntenant/sync"
 )
 
 func main() {
@@ -13,10 +15,10 @@ func main() {
 	key := os.Getenv("K8S_SERVER_KEY")
 
 	http.HandleFunc("/", HandlerDefault)
-	http.HandleFunc("/syncproxy", HandlerTenantToProxy)
-	http.HandleFunc("/syncgrafana", HandlerProxyToGrafana)
+	http.HandleFunc("/proxy/sync", HandlerProxySync())
+	http.HandleFunc("/grafana/sync", HandlerGrafanaSync())
 	// One can use generate_cert.go in crypto/tls to generate cert.pem and key.pem.
-	log.Printf("About to listen on 8443. Go to https://localhost:8443/")
+	log.Printf("About to listen on https://%v/\n", address)
 	err := http.ListenAndServeTLS(address, cert, key, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -25,15 +27,21 @@ func main() {
 
 func HandlerDefault(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
-	io.WriteString(w, `{"status":"ok"}`)
+	io.WriteString(w, `{"server":"ok"}`)
 }
 
-func HandlerTenantToProxy(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	io.WriteString(w, `{"sync":"proxy"}`)
+func HandlerGrafanaSync() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		sync.Grafana()
+		io.WriteString(w, `{"sync":"finished"}`)
+	})
 }
 
-func HandlerProxyToGrafana(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	io.WriteString(w, `{"sync":"grafana"}`)
+func HandlerProxySync() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		sync.Proxy()
+		io.WriteString(w, `{"sync":"finished"}`)
+	})
 }

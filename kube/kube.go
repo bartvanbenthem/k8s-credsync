@@ -89,7 +89,7 @@ func (k *KubeCLient) DeleteSecret(c *kubernetes.Clientset, namespace string, sec
 	deletePolicy := metav1.DeletePropagationForeground
 	err := c.CoreV1().Secrets(namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
 	if err != nil {
-		log.Printf("\nError Deleting \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
+		log.Printf("Error Deleting \"%v\" in \"%v\" Namespace \n", secret.Name, namespace)
 		log.Printf("%v\n", err)
 	}
 	log.Printf("Deleted \"%v\" Secret in \"%v\" Namespace\n",

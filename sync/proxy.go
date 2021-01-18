@@ -17,7 +17,7 @@ func Contains(source []string, value string) bool {
 	return false
 }
 
-func Tenant2Proxy() {
+func Proxy() {
 	// Update and collect all current tenant credentials
 	tcreds, err := tenant.AllTenantCredentials()
 	if err != nil {
@@ -57,4 +57,8 @@ func Tenant2Proxy() {
 		os.Getenv("K8S_PROXY_POD_NAME"))
 	log.Printf("Proxy \"%v\" has been restarted\n",
 		os.Getenv("K8S_PROXY_POD_NAME"))
+	// check for errors
+	if err == nil {
+		log.Printf("Proxy synchronization finished without errors")
+	}
 }

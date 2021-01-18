@@ -8,7 +8,7 @@ import (
 	"github.com/bartvanbenthem/k8s-ntenant/proxy"
 )
 
-func Grafana2Proxy() {
+func Grafana() {
 	// Collect all current proxy credentials
 	pcreds, err := proxy.AllProxyCredentials()
 	if err != nil {
@@ -52,5 +52,8 @@ func Grafana2Proxy() {
 			grafana.CreateDatasource(datasource)
 		}
 	}
-	log.Printf("Grafana Organizations and Datasources are synced\n")
+	// check for errors
+	if err == nil {
+		log.Printf("Grafana synchronization finished without errors")
+	}
 }
