@@ -60,5 +60,7 @@ func Proxy() {
 	// check for errors
 	if err == nil {
 		log.Printf("Proxy synchronization finished without errors")
+	} else {
+		log.Printf("Proxy synchronization finished with errors check log")
 	}
 }

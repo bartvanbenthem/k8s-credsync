@@ -37,7 +37,7 @@ export K8S_GRAFANA_BA_PASSWORD='prom-operator'
 export K8S_GRAFANA_API_URL='grafanatls/api'
 export K8S_GRAFANA_CA_FILE='build/cert/rootCA.crt'
 
-export K8S_SERVER_ADDRESS=':8443'
+export K8S_SERVER_ADDRESS='localhost:8443'
 export K8S_SERVER_CERT='build/cert/server/server.pem'
 export K8S_SERVER_KEY='build/cert/server/server.key'
 ```
@@ -47,6 +47,12 @@ Run the synchronization services as a server
 ```shell
 $ ./k8s-ntenant/build/bin/k8s-ntenant
 ```
+Execute synchronization services
+```shell
+$ curl -k https://$K8S_SERVER_ADDRESS/proxy/sync
+$ curl -k https://$K8S_SERVER_ADDRESS/grafana/sync
+```
+
 Or execute the binary for instant synchronization
 ```shell
 $ ./k8s-ntenant/build/bin/cmd

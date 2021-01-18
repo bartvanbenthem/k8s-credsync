@@ -40,79 +40,107 @@ type Organization struct {
 	} `json:"address"`
 }
 
-func SwitchUserContext(org Organization) {
+func SwitchUserContext(org Organization) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/user/using/%v", grafanapi, org.ID)
 	o, err := json.Marshal(&org)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
+		return err
 	}
 	log.Printf("Switching context to %v Organization\n", org.Name)
-	data := RequestAUTH("POST", url, o)
+	data, err := RequestAUTH("POST", url, o)
+	if err != nil {
+		return err
+	}
 	log.Printf("%v\n", string(data))
+	return err
 }
 
-func GetOrganization(orgname string) Organization {
+func GetOrganization(orgname string) (Organization, error) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/orgs/name/%v", grafanapi, orgname)
-	data := RequestAUTH("GET", url, []byte(""))
 	var org Organization
-	err := json.Unmarshal(data, &org)
+	data, err := RequestAUTH("GET", url, []byte(""))
+	if err != nil {
+		return org, err
+	}
+	err = json.Unmarshal(data, &org)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
+		return org, err
 	}
-	return org
+	return org, err
 }
 
-func CreateOrganization(org Organization) {
+func CreateOrganization(org Organization) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/orgs", grafanapi)
 	b, err := json.Marshal(&org)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
+		return err
 	}
 	log.Printf("Create \"%v\" Grafana Organization\n", org.Name)
-	data := RequestAUTH("POST", url, b)
+	data, err := RequestAUTH("POST", url, b)
+	if err != nil {
+		return err
+	}
 	log.Printf("%v\n", string(data))
+	return err
 }
 
-func GetDatasource(dsname string) Datasource {
+func GetDatasource(dsname string) (Datasource, error) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/datasources/name/%v", grafanapi, dsname)
-	data := RequestAUTH("GET", url, []byte(""))
 	var ds Datasource
-	err := json.Unmarshal(data, &ds)
+	data, err := RequestAUTH("GET", url, []byte(""))
+	if err != nil {
+		return ds, err
+	}
+	err = json.Unmarshal(data, &ds)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
+		return ds, err
 	}
-	return ds
+	return ds, err
 }
 
-func CreateDatasource(ds Datasource) {
+func CreateDatasource(ds Datasource) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/datasources", grafanapi)
 	b, err := json.Marshal(&ds)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
+		return err
 	}
 	log.Printf("Create \"%v\" Grafana Datasource\n", ds.Name)
-	data := RequestAUTH("POST", url, b)
+	data, err := RequestAUTH("POST", url, b)
+	if err != nil {
+		return err
+	}
 	log.Printf("%v\n", string(data))
+	return err
 }
 
-func UpdateDatasource(ds Datasource) {
+func UpdateDatasource(ds Datasource) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/datasources/%v", grafanapi, ds.ID)
 	b, err := json.Marshal(&ds)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v", err)
+		return err
 	}
 	log.Printf("\nUpdate \"%v\" Grafana Datasource\n", ds.Name)
-	data := RequestAUTH("PUT", url, b)
+	data, err := RequestAUTH("PUT", url, b)
+	if err != nil {
+		return err
+	}
 	log.Printf("%v\n", string(data))
+	return err
 }
 
-func RequestAUTH(method, url string, body []byte) []byte {
+func RequestAUTH(method, url string, body []byte) ([]byte, error) {
 	caFile := os.Getenv("K8S_GRAFANA_CA_FILE")
 	var err error
 	var client *http.Client
@@ -128,6 +156,7 @@ func RequestAUTH(method, url string, body []byte) []byte {
 		caCert, err := ioutil.ReadFile(caFile)
 		if err != nil {
 			log.Printf("FATAL ERROR: %v\n", err)
+			return nil, err
 		}
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
@@ -148,6 +177,7 @@ func RequestAUTH(method, url string, body []byte) []byte {
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		log.Printf("%v\n", err)
+		return nil, err
 	}
 	// import grafana credentials from environment var
 	// needed for basic authentication
@@ -157,12 +187,14 @@ func RequestAUTH(method, url string, body []byte) []byte {
 	response, err := client.Do(req)
 	if err != nil {
 		log.Printf("%v\n", err)
+		return nil, err
 	}
 	defer response.Body.Close()
 	// read response body
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Printf("%v\n", err)
+		return data, err
 	}
-	return data
+	return data, err
 }

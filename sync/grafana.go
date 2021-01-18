@@ -17,7 +17,10 @@ func Grafana() {
 
 	// Scan and Create Organizations
 	for _, p := range pcreds.Users {
-		o := grafana.GetOrganization(p.Username)
+		o, err := grafana.GetOrganization(p.Username)
+		if err != nil {
+			log.Printf("%v\n", err)
+		}
 		if len(o.Name) != 0 {
 			log.Printf("Organization \"%v\" exists with ID \"%v\"\n", o.Name, o.ID)
 		} else {
@@ -29,11 +32,17 @@ func Grafana() {
 
 	// Scan an create datasources
 	for _, p := range pcreds.Users {
-		o := grafana.GetOrganization(p.Username)
+		o, err := grafana.GetOrganization(p.Username)
+		if err != nil {
+			log.Printf("%v\n", err)
+		}
 		if len(o.Name) == 0 {
 			log.Printf("Organization \"%v\" Cannot be found\n", p.Username)
 		}
-		ds := grafana.GetDatasource(p.Username)
+		ds, err := grafana.GetDatasource(p.Username)
+		if err != nil {
+			log.Printf("%v\n", err)
+		}
 		var datasource grafana.Datasource
 		datasource.Name = p.Username
 		datasource.Type = "loki"
@@ -47,13 +56,15 @@ func Grafana() {
 			log.Printf("Datasource \"%v\" already exists\n", ds.Name)
 		} else {
 			// switch the user context to the correct organization
-			grafana.SwitchUserContext(o)
+			err = grafana.SwitchUserContext(o)
 			// create datasource in the current context
-			grafana.CreateDatasource(datasource)
+			err = grafana.CreateDatasource(datasource)
 		}
 	}
 	// check for errors
 	if err == nil {
 		log.Printf("Grafana synchronization finished without errors")
+	} else {
+		log.Printf("Grafana synchronization finished with errors check log")
 	}
 }
