@@ -55,7 +55,6 @@ $ curl -k https://$K8S_SERVER_ADDRESS/grafana/sync
 ```
 
 # TODO
-* Design and create a function that checks if a kubernetes resource object exists to replace temp wait func.
 * Design and transform the current build to a kubernetes native build including monitoring.
 * Design and create a function for snapshotting the proxy secret before change trough the sync functions.
 * Design and create a update function only for the passwords.
