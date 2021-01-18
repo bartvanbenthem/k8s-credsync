@@ -17,16 +17,18 @@ func Contains(source []string, value string) bool {
 	return false
 }
 
-func Proxy() {
+func Proxy() error {
 	// Update and collect all current tenant credentials
 	tcreds, err := tenant.AllTenantCredentials()
 	if err != nil {
 		log.Printf("%v\n", err)
+		return err
 	}
 	// Update and collect all current proxy credentials
 	pcreds, err := proxy.AllProxyCredentials()
 	if err != nil {
 		log.Printf("%v\n", err)
+		return err
 	}
 
 	// create a slice with all the tenant usernames
@@ -57,10 +59,6 @@ func Proxy() {
 		os.Getenv("K8S_PROXY_POD_NAME"))
 	log.Printf("Proxy \"%v\" has been restarted\n",
 		os.Getenv("K8S_PROXY_POD_NAME"))
-	// check for errors
-	if err == nil {
-		log.Printf("Proxy synchronization finished without errors")
-	} else {
-		log.Printf("Proxy synchronization finished with errors inspect log")
-	}
+	// return err
+	return err
 }

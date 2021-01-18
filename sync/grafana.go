@@ -8,11 +8,12 @@ import (
 	"github.com/bartvanbenthem/k8s-ntenant/proxy"
 )
 
-func Grafana() {
+func Grafana() error {
 	// Collect all current proxy credentials
 	pcreds, err := proxy.AllProxyCredentials()
 	if err != nil {
 		log.Printf("%v\n", err)
+		return err
 	}
 
 	// Scan and Create Organizations
@@ -35,6 +36,7 @@ func Grafana() {
 		o, err := grafana.GetOrganization(p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
+			return err
 		}
 		if len(o.Name) == 0 {
 			log.Printf("Organization \"%v\" Cannot be found\n", p.Username)
@@ -42,6 +44,7 @@ func Grafana() {
 		ds, err := grafana.GetDatasource(p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
+			return err
 		}
 		var datasource grafana.Datasource
 		datasource.Name = p.Username
@@ -57,14 +60,18 @@ func Grafana() {
 		} else {
 			// switch the user context to the correct organization
 			err = grafana.SwitchUserContext(o)
+			if err != nil {
+				log.Printf("%v\n", err)
+				return err
+			}
 			// create datasource in the current context
 			err = grafana.CreateDatasource(datasource)
+			if err != nil {
+				log.Printf("%v\n", err)
+				return err
+			}
 		}
 	}
-	// check for errors
-	if err == nil {
-		log.Printf("Grafana synchronization finished without errors")
-	} else {
-		log.Printf("Grafana synchronization finished with errors inspect log")
-	}
+	// return err
+	return err
 }
