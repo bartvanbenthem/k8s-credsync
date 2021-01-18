@@ -29,7 +29,7 @@ func main() {
 // default handler
 func HandlerDefault(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
-	io.WriteString(w, `{"server":"ok"}`)
+	io.WriteString(w, `{"server":"running"}`)
 }
 
 // handler for proxy synchronization service

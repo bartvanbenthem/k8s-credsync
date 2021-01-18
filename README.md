@@ -16,12 +16,6 @@ Multi tenant monitoring and logging solution with credential synchronization on 
 Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
 ## Install and run
-```shell
-$ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
-# deploy Loki and proxy for a multi-tenant logging setup
-$ cd k8s-ntenant/build/loki-ntenant-setup/
-$ ./deploy.sh
-```
 
 #### Set environment variables
 ```shell
@@ -42,20 +36,22 @@ export K8S_SERVER_CERT='build/cert/server/server.pem'
 export K8S_SERVER_KEY='build/cert/server/server.key'
 ```
 
-#### Run sync services
-Run the synchronization services as a server
+#### deploy k8s-ntenant
 ```shell
-$ ./k8s-ntenant/build/bin/k8s-ntenant
-```
-Execute synchronization services
-```shell
-$ curl -k https://$K8S_SERVER_ADDRESS/proxy/sync
-$ curl -k https://$K8S_SERVER_ADDRESS/grafana/sync
+$ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
+# deploy Loki and proxy for a multi-tenant logging setup
+$ cd k8s-ntenant/build/loki-ntenant-setup/
+$ ./deploy.sh
 ```
 
-Or execute the binary for instant synchronization
+#### Run the synchronization server
+Run the k8s-ntenant synchronization server
 ```shell
-$ ./k8s-ntenant/build/bin/cmd
+# start the k8s-ntenant server
+$ ./k8s-ntenant/build/bin/k8s-ntenant
+# Execute the synchronization services
+$ curl -k https://$K8S_SERVER_ADDRESS/proxy/sync
+$ curl -k https://$K8S_SERVER_ADDRESS/grafana/sync
 ```
 
 # TODO
