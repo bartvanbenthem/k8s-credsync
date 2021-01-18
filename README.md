@@ -5,7 +5,7 @@ Multi tenant monitoring and logging solution with credential synchronization on 
 * github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
 * github.com/boz/kail is used for log streaming.
 * go-client sdk is used to interract with the kubernetes API.
-* A custom rest client with basic auth is used to interract with the Grafana API.
+* A custom tls client with basic auth is used to interract with the Grafana API.
 * Environment variables are set for dynamic configuration parameters.
 
 ### technical requirements
