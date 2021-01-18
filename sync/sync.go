@@ -53,7 +53,7 @@ func Proxy() error {
 	}
 
 	// update proxy kubernetes secret
-	err = proxy.ReplaceProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
+	err = proxy.UpdateProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		"authn.yaml", pcreds)
 	// restart proxy
 	proxy.RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),

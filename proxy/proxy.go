@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/bartvanbenthem/k8s-ntenant/kube"
 	"gopkg.in/yaml.v2"
@@ -37,7 +36,7 @@ func GetProxyCredentials(file string) (ProxyCredentials, error) {
 	return c, err
 }
 
-func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) error {
+func UpdateProxySecret(namespace, datafield string, newc ProxyCredentials) error {
 	// import required environment variables
 	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
 	var kube kube.KubeCLient
@@ -48,6 +47,7 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) erro
 		return err
 	}
 
+	// get current secret
 	sec := kube.GetSecret(kube.CreateClientSet(), namespace, proxysec)
 	sec.Data[datafield] = credbyte
 
@@ -59,15 +59,8 @@ func ReplaceProxySecret(namespace, datafield string, newc ProxyCredentials) erro
 	newsecret.Name = sec.Name
 	newsecret.Namespace = sec.Namespace
 
-	// delete secret
-	kube.DeleteSecret(kube.CreateClientSet(), namespace, sec)
-
-	// ONLY FOR TESTING PURPOSES
-	// CREATE A SECRET EXISTS CHECK FUNCTION INSTEAD OF SLEEP !!!!!!!!
-	time.Sleep(5 * time.Second)
-
-	// create secret
-	_ = kube.CreateSecret(kube.CreateClientSet(), namespace, &newsecret)
+	// Update auth proxy secret with tenant credentials
+	kube.UpdateSecret(kube.CreateClientSet(), namespace, &newsecret)
 	// get/validate secret
 	_ = kube.GetSecret(kube.CreateClientSet(), namespace, newsecret.Name)
 	if err != nil {
