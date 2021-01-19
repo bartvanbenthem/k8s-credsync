@@ -19,7 +19,7 @@ Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
 #### Set environment variables
 ```shell
-export K8S_KUBECONFIG='/var/snap/microk8s/current/credentials/client.config'
+export K8S_KUBECONFIG='build/k8s-ntenant-sync/context/client.config'
 export K8S_PROXY_SECRET_NAME='loki-multi-tenant-proxy-auth-config'
 export K8S_PROXY_SECRET_NAMESPACE='co-monitoring'
 export K8S_TENANT_SECRET_NAME='log-recolector-config'
@@ -29,11 +29,11 @@ export K8S_PROXY_URL_PORT='http://loki-multi-tenant-proxy.co-monitoring.svc.clus
 export K8S_GRAFANA_BA_USER='admin'
 export K8S_GRAFANA_BA_PASSWORD='prom-operator'
 export K8S_GRAFANA_API_URL='grafanatls/api'
-export K8S_GRAFANA_CA_FILE='build/cert/rootCA.crt'
+export K8S_GRAFANA_CA_FILE='build/k8s-ntenant-sync/cert/rootCA.crt'
 
 export K8S_SERVER_ADDRESS='localhost:8443'
-export K8S_SERVER_CERT='build/cert/server/server.pem'
-export K8S_SERVER_KEY='build/cert/server/server.key'
+export K8S_SERVER_CERT='build/k8s-ntenant-sync/cert/server/server.pem'
+export K8S_SERVER_KEY='build/k8s-ntenant-sync/cert/server/server.key'
 ```
 
 #### Deploy k8s-ntenant

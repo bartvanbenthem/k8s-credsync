@@ -63,10 +63,6 @@ func UpdateProxySecret(namespace, datafield string, newc ProxyCredentials) error
 	kube.UpdateSecret(kube.CreateClientSet(), namespace, &newsecret)
 	// get/validate secret
 	_ = kube.GetSecret(kube.CreateClientSet(), namespace, newsecret.Name)
-	if err != nil {
-		log.Printf("%v\n", err)
-		return err
-	}
 	return err
 }
 

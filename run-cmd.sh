@@ -14,13 +14,13 @@ export K8S_PROXY_URL_PORT='http://loki-multi-tenant-proxy.co-monitoring.svc.clus
 export K8S_GRAFANA_BA_USER='admin'
 export K8S_GRAFANA_BA_PASSWORD='prom-operator'
 export K8S_GRAFANA_API_URL='grafanatls/api'
-export K8S_GRAFANA_CA_FILE='build/cert/grafana/rootCA.crt'
+export K8S_GRAFANA_CA_FILE='build/k8s-ntenant-sync/cert/grafana/rootCA.crt'
 
 # create build
 cd cmd
 go build .
 cd ..
-mv -f cmd/cmd build/bin/
+mv -f cmd/cmd build/k8s-ntenant-sync/bin/
 
 # run ntenant-sync binary
-./build/bin/cmd
+./build/k8s-ntenant-sync/bin/cmd

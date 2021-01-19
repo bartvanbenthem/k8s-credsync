@@ -12,18 +12,29 @@ import (
 func main() {
 	// get from environment variables
 	address := os.Getenv("K8S_SERVER_ADDRESS")
-	cert := os.Getenv("K8S_SERVER_CERT")
-	key := os.Getenv("K8S_SERVER_KEY")
+	//cert := os.Getenv("K8S_SERVER_CERT")
+	//key := os.Getenv("K8S_SERVER_KEY")
+
 	// http handler functions
 	http.HandleFunc("/", HandlerDefault)
 	http.HandleFunc("/proxy/sync", HandlerProxySync())
 	http.HandleFunc("/grafana/sync", HandlerGrafanaSync())
-	// listen and serve https connections
-	log.Printf("About to listen on https://%v/\n", address)
-	err := http.ListenAndServeTLS(address, cert, key, nil)
+
+	// listen and serve http connections
+	log.Printf("About to listen on http://%v/\n", address)
+	err := http.ListenAndServe(address, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	/*
+		// listen and serve https connections
+		log.Printf("About to listen on https://%v/\n", address)
+		err := http.ListenAndServeTLS(address, cert, key, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+	*/
 }
 
 // default handler
