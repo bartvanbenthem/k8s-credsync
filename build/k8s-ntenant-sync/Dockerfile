@@ -16,7 +16,7 @@ COPY cert/server/. ./server
 RUN mkdir grafana
 COPY cert/grafana/. ./grafana
 RUN mkdir kubeconfig
-COPY context/client.config ./kubeconfig/
+COPY kubeconfig/client.config ./kubeconfig/
 
 # Expose port 3111 to the outside world
 EXPOSE 3111
