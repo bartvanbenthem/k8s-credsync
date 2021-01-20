@@ -9,8 +9,6 @@ spec:
   - name: k8s-ntenant-sync
     image: bartvanbenthem/k8s-ntenant:v1
     env:
-    - name: K8S_KUBECONFIG
-      value: "kubeconfig/client.config"
     - name: K8S_PROXY_SECRET_NAME
       value: "loki-multi-tenant-proxy-auth-config"
     - name: K8S_PROXY_SECRET_NAMESPACE
