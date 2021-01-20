@@ -29,14 +29,17 @@ $ kubectl get secret --namespace co-monitoring grafana \
 
 ## Install and run
 
-#### Get the project
+#### Get the project source
 ```shell
 $ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
 # cd to project root
 $ cd k8s-ntenant
 ```
 
-#### Deploy Loki in multi-tenant setup
+#### certificates and kubeconfig file
+soon
+
+#### Deploy Loki and authentication proxy on the cluster
 ```shell
 # create namespaces
 $ kubectl create namespace 'co-monitoring'
@@ -49,7 +52,7 @@ $ kubectl apply -f build/loki-ntenant-setup/.
 $ echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
 ```
 
-#### build and run synchronization server in a local container
+#### Build and run synchronization server (local container)
 ```shell
 # change dir
 $ cd build/k8s-ntenant-sync
