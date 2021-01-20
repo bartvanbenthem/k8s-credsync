@@ -18,6 +18,7 @@ Run and expose Grafana instance on the Kubernetes cluster:
 ```shell
 # create namespace
 $ kubectl create namespace 'co-monitoring'
+
 # install Grafana helmchart
 $ helm repo add grafana https://grafana.github.io/helm-charts
 $ helm repo update
@@ -25,14 +26,16 @@ $ helm install grafana --namespace=co-monitoring grafana/grafana
 # grafana password
 $ kubectl get secret --namespace co-monitoring grafana \
   -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
 # create secret with the grafanatls certificates
-kubectl create secret tls grafanatls-secret \
---cert=build/k8s-ntenant-sync/cert/grafana/grafanatls.crt \
---key=build/k8s-ntenant-sync/cert/grafana/grafanatls.key \
---namespace co-monitoring
-kubectl describe secret grafanatls-secret --namespace co-monitoring
+$ kubectl create secret tls grafanatls-secret \
+   --cert=build/k8s-ntenant-sync/cert/grafana/grafanatls.crt \
+   --key=build/k8s-ntenant-sync/cert/grafana/grafanatls.key \
+   --namespace co-monitoring
+$ kubectl describe secret grafanatls-secret --namespace co-monitoring
+
 # expose grafanatls trough the ingress controller
-kubectl apply -f build/k8s-ntenant-sync/cert/grafana/grafana-tls.yaml
+$ kubectl apply -f build/k8s-ntenant-sync/cert/grafana/grafana-tls.yaml
 # make sure the grafanatls hostname is resolvable to the Loadbalancer/node
 ```
 
@@ -41,36 +44,36 @@ kubectl apply -f build/k8s-ntenant-sync/cert/grafana/grafana-tls.yaml
 #### Get the project source
 ```shell
 $ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
-# cd to project root
 $ cd k8s-ntenant
 ```
 
 ### Deploy Loki with authentication proxy on Kubernetes
 ```shell
-# create namespaces
+# create required namespaces
 $ kubectl create namespace 'co-monitoring'
 $ kubectl create namespace 'team-alpha-dev'
 $ kubectl create namespace 'team-beta-test'
 $ kubectl create namespace 'team-charlie-test'
-# apply the loki multi tenant setup
+
+# apply the loki multi tenant setup and print the datasource url
 $ kubectl apply -f build/loki-ntenant-setup/.
-# datasource url
 $ echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
 ```
 
 ### Build k8s-ntenant-sync container and push to repo
 ```shell
-# change dir
-$ cd build/k8s-ntenant-sync
 # build the container
+$ cd build/k8s-ntenant-sync
 $ docker build -t bartvanbenthem/k8s-ntenant .
+
 # tag image
-docker tag bartvanbenthem/k8s-ntenant bartvanbenthem/k8s-ntenant:v1
-docker image ls
-# login to dockerhub repo
-docker login "docker.io"
-# push image to the repo
-docker push bartvanbenthem/k8s-ntenant:v1
+$ docker tag bartvanbenthem/k8s-ntenant bartvanbenthem/k8s-ntenant:v1
+$ docker image ls
+
+# login and push image to dockerhub repo
+$ docker login "docker.io"
+$ docker push bartvanbenthem/k8s-ntenant:v1
+
 # back to project root
 $ cd ../..
 ```
@@ -87,6 +90,7 @@ $ kubectl apply -f build/k8s-ntenant-sync/kubernetes/.
 $ curl http://localhost:31110/
 $ curl http://localhost:31110/proxy/sync
 $ curl http://localhost:31110/grafana/sync
+
 # view sync logs
 $ kubectl logs k8s-ntenant-sync
 ```
