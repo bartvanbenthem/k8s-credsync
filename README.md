@@ -15,14 +15,38 @@ Multi tenant monitoring and logging solution with credential synchronization on 
 ## Prerequisites
 Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
+Running instance of Grafana exposed through ingress:
+```shell
+# install Grafana helmchart
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+helm install grafana --namespace=co-monitoring grafana/grafana
+# grafana password
+kubectl get secret --namespace co-monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+# make sure the grafanatls hostname is resolvable to the ingress controller LB IP
+```
+
 ## Install and run
+
+#### Get the project
+```shell
+$ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
+# cd to project root
+$ cd k8s-ntenant
+```
 
 #### Deploy Loki in multi-tenant setup
 ```shell
-$ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
-# Deploy Loki and proxy for a multi-tenant logging setup
-$ cd k8s-ntenant/build/loki-ntenant-setup/
-$ ./deploy.sh
+# create namespaces
+kubectl create namespace 'co-monitoring'
+kubectl create namespace 'team-alpha-dev'
+kubectl create namespace 'team-beta-test'
+kubectl create namespace 'team-charlie-test'
+# apply the loki multi tenant setup
+kubectl apply -f k8s-ntenant/build/loki-ntenant-setup/.
+# datasource url
+echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
+
 ```
 
 #### build and run synchronization container
