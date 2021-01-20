@@ -14,7 +14,7 @@ Multi tenant monitoring and logging solution with credential synchronization on 
 ## Prerequisites
 Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
-Running instance of Grafana exposed through ingress:
+Running and exosed Grafana instance on the Kubernetes cluster:
 ```shell
 # install Grafana helmchart
 $ helm repo add grafana https://grafana.github.io/helm-charts
@@ -23,7 +23,15 @@ $ helm install grafana --namespace=co-monitoring grafana/grafana
 # grafana password
 $ kubectl get secret --namespace co-monitoring grafana \
   -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-# make sure the grafanatls hostname is resolvable to the ingress controller LB IP
+# create secret with the grafanatls certificates
+kubectl create secret tls grafanatls-secret \
+--cert=build/k8s-ntenant-sync/cert/grafana/grafanatls.crt \
+--key=build/k8s-ntenant-sync/cert/grafana/grafanatls.key \
+--namespace co-monitoring
+kubectl describe secret grafanatls-secret --namespace co-monitoring
+# expose grafanatls trough the ingress controller
+kubectl apply -f build/k8s-ntenant-sync/cert/grafana/grafana-tls.yaml
+# make sure the grafanatls hostname is resolvable to the Loadbalancer/node
 ```
 
 ## Install and run

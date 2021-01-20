@@ -17,4 +17,5 @@ spec:
         - path: /
           backend:
             serviceName: co-prometheus-grafana
-            servicePort: 80        
+            servicePort: 80
+        
