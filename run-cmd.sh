@@ -10,7 +10,6 @@ export K8S_PROXY_SECRET_NAMESPACE='co-monitoring'
 export K8S_TENANT_SECRET_NAME='log-recolector-config'
 export K8S_PROXY_POD_NAME='loki-multi-tenant-proxy-'
 export K8S_PROXY_URL_PORT='http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
-
 export K8S_GRAFANA_BA_USER='admin'
 export K8S_GRAFANA_BA_PASSWORD='prom-operator'
 export K8S_GRAFANA_API_URL='grafanatls/api'

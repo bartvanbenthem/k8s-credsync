@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: k8s-ntenant-sync
+  labels:
+    app: k8s-ntenant-sync
+spec:
+  containers:
+  - name: k8s-ntenant-sync
+    image: bartvanbenthem/k8s-ntenant:v1
+    env:
+    - name: K8S_KUBECONFIG
+      value: "kubeconfig/client.config"
+    - name: K8S_PROXY_SECRET_NAME
+      value: "loki-multi-tenant-proxy-auth-config"
+    - name: K8S_PROXY_SECRET_NAMESPACE
+      value: "co-monitoring"
+    - name: K8S_TENANT_SECRET_NAME
+      value: "log-recolector-config"
+    - name: K8S_PROXY_POD_NAME
+      value: "loki-multi-tenant-proxy-"
+    - name: K8S_PROXY_URL_PORT
+      value: "http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100"
+    - name: K8S_GRAFANA_BA_USER
+      value: "admin"
+    - name: K8S_GRAFANA_BA_PASSWORD
+      value: "prom-operator"
+    - name: K8S_GRAFANA_API_URL
+      value: "co-prometheus-grafana.co-monitoring.svc.cluster.local:80/api"
+    - name: K8S_SERVER_ADDRESS
+      value: "0.0.0.0:3111"
+    ports:
+    - containerPort: 3111
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-ntenant
+spec:
+  type: NodePort
+  selector:
+    app: k8s-ntenant-sync
+  ports:
+    - port: 3111
+      targetPort: 3111
+      nodePort: 31110

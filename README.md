@@ -43,7 +43,7 @@ $ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
 $ cd k8s-ntenant
 ```
 
-### Deploy Loki and authentication proxy on Kubernetes
+### Deploy Loki with authentication proxy on Kubernetes
 ```shell
 # create namespaces
 $ kubectl create namespace 'co-monitoring'
@@ -56,49 +56,37 @@ $ kubectl apply -f build/loki-ntenant-setup/.
 $ echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
 ```
 
-#### Certificates and kubeconfig file
-soon
-
-### Build and run k8s-ntenant-sync server (local)
+### Build k8s-ntenant-sync container and push to repo
 ```shell
 # change dir
 $ cd build/k8s-ntenant-sync
 # build the container
-$ docker build -t k8s-ntenant .
+$ docker build -t bartvanbenthem/k8s-ntenant .
+# tag image
+docker tag bartvanbenthem/k8s-ntenant bartvanbenthem/k8s-ntenant:v1
+docker image ls
+# login to dockerhub repo
+docker login "docker.io"
+# push image to the repo
+docker push bartvanbenthem/k8s-ntenant:v1
 # back to project root
 $ cd ../..
-# run container with env variables
-docker run -d --name k8s-ntenant \
--e K8S_KUBECONFIG='kubeconfig/client.config' \
--e K8S_PROXY_SECRET_NAME='loki-multi-tenant-proxy-auth-config' \
--e K8S_PROXY_SECRET_NAMESPACE='co-monitoring' \
--e K8S_TENANT_SECRET_NAME='log-recolector-config' \
--e K8S_PROXY_POD_NAME='loki-multi-tenant-proxy-' \
--e K8S_PROXY_URL_PORT='http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100' \
--e K8S_GRAFANA_BA_USER='admin' \
--e K8S_GRAFANA_BA_PASSWORD='prom-operator' \
--e K8S_GRAFANA_API_URL='grafanatls/api' \
--e K8S_GRAFANA_CA_FILE='grafana/rootCA.crt' \
--e K8S_SERVER_ADDRESS='0.0.0.0:3111' \
---add-host 'grafanatls:192.168.2.163' -p 8080:3111 k8s-ntenant 
-#-e K8S_SERVER_CERT='<provide .crt file for starting a TLS server>' \
-#-e K8S_SERVER_KEY='<provide .pem file for starting a TLS server>' \
-
 ```
 
 ### Run k8s-ntenant-sync server on Kubernetes
-soon
+```shell
+# Deploy k8s-ntenant sync server on kubernetes
+$ kubectl apply -f build/k8s-ntenant-sync/kubernetes/.
+```
 
 #### Execute synchronization from webclient
 ```shell
 # test from client
-$ curl http://localhost:8080/
-$ curl http://localhost:8080/proxy/sync
-$ curl http://localhost:8080/grafana/sync
+$ curl http://localhost:31110/
+$ curl http://localhost:31110/proxy/sync
+$ curl http://localhost:31110/grafana/sync
 # view sync logs
-$ docker container logs k8s-ntenant
-# interactive session
-$ docker container exec -it k8s-ntenant /bin/bash
+$ kubectl logs k8s-ntenant-sync
 ```
 
 # TODO

@@ -11,12 +11,10 @@ WORKDIR /app
 
 # Copy files
 COPY ./bin/k8s-ntenant ./
-RUN mkdir server
-COPY cert/server/. ./server/
-RUN mkdir grafana
-COPY cert/grafana/. ./grafana/
+# create dirs for tls files when tls is required
+RUN mkdir -p cert/server
+RUN mkdir -p cert/grafana
 RUN mkdir kubeconfig
-COPY kubeconfig/client.config ./kubeconfig/
 
 # Expose port 3111 to the outside world
 EXPOSE 3111
