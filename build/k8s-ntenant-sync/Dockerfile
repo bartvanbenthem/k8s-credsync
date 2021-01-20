@@ -12,9 +12,9 @@ WORKDIR /app
 # Copy files
 COPY ./bin/k8s-ntenant ./
 RUN mkdir server
-COPY cert/server/. ./server
+COPY cert/server/. ./server/
 RUN mkdir grafana
-COPY cert/grafana/. ./grafana
+COPY cert/grafana/. ./grafana/
 RUN mkdir kubeconfig
 COPY kubeconfig/client.config ./kubeconfig/
 
