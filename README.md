@@ -43,13 +43,12 @@ kubectl create namespace 'team-alpha-dev'
 kubectl create namespace 'team-beta-test'
 kubectl create namespace 'team-charlie-test'
 # apply the loki multi tenant setup
-kubectl apply -f k8s-ntenant/build/loki-ntenant-setup/.
+kubectl apply -f build/loki-ntenant-setup/.
 # datasource url
 echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
-
 ```
 
-#### build and run synchronization container
+#### build and run synchronization server in a local container
 ```shell
 # change dir
 cd build/k8s-ntenant-sync
@@ -76,7 +75,7 @@ docker run -d --name k8s-ntenant \
 
 ```
 
-#### test sync execution from client
+#### test synchronization from client
 Run the k8s-ntenant synchronization server
 ```shell
 # test from client
