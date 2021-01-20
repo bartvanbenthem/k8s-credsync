@@ -16,6 +16,8 @@ Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
 Run and expose Grafana instance on the Kubernetes cluster:
 ```shell
+# create namespace
+$ kubectl create namespace 'co-monitoring'
 # install Grafana helmchart
 $ helm repo add grafana https://grafana.github.io/helm-charts
 $ helm repo update
