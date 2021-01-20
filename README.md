@@ -35,10 +35,7 @@ $ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
 $ cd k8s-ntenant
 ```
 
-#### certificates and kubeconfig file
-soon
-
-#### Deploy Loki and authentication proxy on the cluster
+### Deploy Loki and authentication proxy on Kubernetes
 ```shell
 # create namespaces
 $ kubectl create namespace 'co-monitoring'
@@ -51,7 +48,10 @@ $ kubectl apply -f build/loki-ntenant-setup/.
 $ echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
 ```
 
-#### Build and run synchronization server (local container)
+#### Certificates and kubeconfig file
+soon
+
+### Build and run k8s-ntenant-sync server (local)
 ```shell
 # change dir
 $ cd build/k8s-ntenant-sync
@@ -78,8 +78,10 @@ docker run -d --name k8s-ntenant \
 
 ```
 
-#### test synchronization from client
-Run the k8s-ntenant synchronization server
+### Run k8s-ntenant-sync server on Kubernetes
+soon
+
+#### Execute synchronization from webclient
 ```shell
 # test from client
 $ curl http://localhost:8080/
