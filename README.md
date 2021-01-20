@@ -14,7 +14,7 @@ Multi tenant monitoring and logging solution with credential synchronization on 
 ## Prerequisites
 Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
-Running and exosed Grafana instance on the Kubernetes cluster:
+Run and expose Grafana instance on the Kubernetes cluster:
 ```shell
 # install Grafana helmchart
 $ helm repo add grafana https://grafana.github.io/helm-charts
