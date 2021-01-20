@@ -8,9 +8,8 @@ Multi tenant monitoring and logging solution with credential synchronization on 
 * A custom tls client with basic auth is used to interract with the Grafana API.
 * Environment variables are set for dynamic configuration parameters.
 
-### Technical requirements
+### Requirements
 * The Tenant username should always be identical with the tenant namespace name.
-* The multi tenant auth proxy needs to be restarted after secret data update.
 
 ## Prerequisites
 Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
