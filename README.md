@@ -18,11 +18,12 @@ Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 Running instance of Grafana exposed through ingress:
 ```shell
 # install Grafana helmchart
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-helm install grafana --namespace=co-monitoring grafana/grafana
+$ helm repo add grafana https://grafana.github.io/helm-charts
+$ helm repo update
+$ helm install grafana --namespace=co-monitoring grafana/grafana
 # grafana password
-kubectl get secret --namespace co-monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+$ kubectl get secret --namespace co-monitoring grafana \
+  -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 # make sure the grafanatls hostname is resolvable to the ingress controller LB IP
 ```
 
@@ -38,24 +39,24 @@ $ cd k8s-ntenant
 #### Deploy Loki in multi-tenant setup
 ```shell
 # create namespaces
-kubectl create namespace 'co-monitoring'
-kubectl create namespace 'team-alpha-dev'
-kubectl create namespace 'team-beta-test'
-kubectl create namespace 'team-charlie-test'
+$ kubectl create namespace 'co-monitoring'
+$ kubectl create namespace 'team-alpha-dev'
+$ kubectl create namespace 'team-beta-test'
+$ kubectl create namespace 'team-charlie-test'
 # apply the loki multi tenant setup
-kubectl apply -f build/loki-ntenant-setup/.
+$ kubectl apply -f build/loki-ntenant-setup/.
 # datasource url
-echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
+$ echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
 ```
 
 #### build and run synchronization server in a local container
 ```shell
 # change dir
-cd build/k8s-ntenant-sync
+$ cd build/k8s-ntenant-sync
 # build the container
-docker build -t k8s-ntenant .
+$ docker build -t k8s-ntenant .
 # back to project root
-cd ../..
+$ cd ../..
 # run container with env variables
 docker run -d --name k8s-ntenant \
 -e K8S_KUBECONFIG='kubeconfig/client.config' \
@@ -79,13 +80,13 @@ docker run -d --name k8s-ntenant \
 Run the k8s-ntenant synchronization server
 ```shell
 # test from client
-curl http://localhost:8080/
-curl http://localhost:8080/proxy/sync
-curl http://localhost:8080/grafana/sync
+$ curl http://localhost:8080/
+$ curl http://localhost:8080/proxy/sync
+$ curl http://localhost:8080/grafana/sync
 # view sync logs
-docker container logs k8s-ntenant
+$ docker container logs k8s-ntenant
 # interactive session
-docker container exec -it k8s-ntenant /bin/bash
+$ docker container exec -it k8s-ntenant /bin/bash
 ```
 
 # TODO
