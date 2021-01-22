@@ -1,39 +1,77 @@
 apiVersion: v1
-kind: Pod
+kind: ServiceAccount
+metadata:
+  name: k8s-ntenant-sa
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: k8s-ntenant-secret
+type: kubernetes.io/basic-auth
+stringData:
+  username: admin
+  password: prom-operator
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-ntenant-config
+data:
+  K8S_PROXY_SECRET_NAME: loki-multi-tenant-proxy-auth-config
+  K8S_PROXY_SECRET_NAMESPACE: co-monitoring
+  K8S_TENANT_SECRET_NAME: log-recolector-config
+  K8S_PROXY_POD_NAME: loki-multi-tenant-proxy-
+  K8S_PROXY_URL_PORT: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100
+  K8S_GRAFANA_API_URL: co-prometheus-grafana.co-monitoring.svc.cluster.local:80/api
+  K8S_SERVER_ADDRESS: 0.0.0.0:3111
+---
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: k8s-ntenant-sync
   labels:
     app: k8s-ntenant-sync
 spec:
-  containers:
-  - name: k8s-ntenant-sync
-    image: bartvanbenthem/k8s-ntenant:v1
-    env:
-    - name: K8S_PROXY_SECRET_NAME
-      value: "loki-multi-tenant-proxy-auth-config"
-    - name: K8S_PROXY_SECRET_NAMESPACE
-      value: "co-monitoring"
-    - name: K8S_TENANT_SECRET_NAME
-      value: "log-recolector-config"
-    - name: K8S_PROXY_POD_NAME
-      value: "loki-multi-tenant-proxy-"
-    - name: K8S_PROXY_URL_PORT
-      value: "http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100"
-    - name: K8S_GRAFANA_BA_USER
-      value: "admin"
-    - name: K8S_GRAFANA_BA_PASSWORD
-      value: "prom-operator"
-    - name: K8S_GRAFANA_API_URL
-      value: "co-prometheus-grafana.co-monitoring.svc.cluster.local:80/api"
-    - name: K8S_SERVER_ADDRESS
-      value: "0.0.0.0:3111"
-    ports:
-    - containerPort: 3111
+  replicas: 2
+  selector:
+    matchLabels:
+      app: k8s-ntenant-sync
+  template:
+    metadata:
+      labels:
+        app: k8s-ntenant-sync
+    spec:
+      serviceAccountName: k8s-ntenant-sa
+      containers:
+      - name: k8s-ntenant-sync
+        image: bartvanbenthem/k8s-ntenant:v1
+        env:
+          - name: K8S_GRAFANA_BA_USER
+            valueFrom:
+              secretKeyRef:
+                name: k8s-ntenant-secret
+                key: username
+          - name: K8S_GRAFANA_BA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: k8s-ntenant-secret
+                key: password
+        envFrom: 
+        - configMapRef:
+            name: k8s-ntenant-config
+        ports:
+        - containerPort: 3111
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3111
+          initialDelaySeconds: 5
+          periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: k8s-ntenant
+  name: k8s-ntenant-svc
 spec:
   type: NodePort
   selector:
