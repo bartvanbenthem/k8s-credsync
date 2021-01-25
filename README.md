@@ -92,7 +92,7 @@ $ curl http://localhost:31110/proxy/sync
 $ curl http://localhost:31110/grafana/sync
 
 # view sync logs
-$ kubectl logs k8s-ntenant-sync
+$ kubectl logs k8s-ntenant-sync-
 ```
 
 # TODO

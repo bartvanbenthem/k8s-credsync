@@ -33,7 +33,7 @@ metadata:
   name: loki-multi-tenant-proxy
   namespace: co-monitoring
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: loki-multi-tenant-proxy
