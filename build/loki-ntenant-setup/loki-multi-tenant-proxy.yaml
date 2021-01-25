@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: loki-multi-tenant-proxy
-        image: angelbarrera92/loki-multi-tenant-proxy:dev
+        image: bartvanbenthem/k8s-ntenant-proxy:v1
         args:
           - "run"
           - "--port=3100"
