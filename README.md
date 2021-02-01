@@ -96,7 +96,6 @@ $ kubectl logs k8s-ntenant-sync-
 ```
 
 # TODO
-* Design and transform the current build to a kubernetes native build including monitoring.
 * Design and create a function for snapshotting the proxy secret before change trough the sync functions.
 * Design and create a update function only for the passwords.
 
