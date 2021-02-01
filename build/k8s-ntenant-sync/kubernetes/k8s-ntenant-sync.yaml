@@ -32,7 +32,7 @@ metadata:
   labels:
     app: k8s-ntenant-sync
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: k8s-ntenant-sync
@@ -73,10 +73,25 @@ kind: Service
 metadata:
   name: k8s-ntenant-svc
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: k8s-ntenant-sync
   ports:
     - port: 3111
       targetPort: 3111
-      nodePort: 31110
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: k8s-ntenant-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: ntenant
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: k8s-ntenant-svc
+            servicePort: 3111
