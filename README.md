@@ -64,15 +64,15 @@ $ echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
 ```shell
 # build the container
 $ cd build/k8s-ntenant-sync
-$ docker build -t bartvanbenthem/k8s-ntenant .
+$ docker build -t bartvanbenthem/k8s-ntenant-sync .
 
 # tag image
-$ docker tag bartvanbenthem/k8s-ntenant bartvanbenthem/k8s-ntenant:v1
+$ docker tag bartvanbenthem/k8s-ntenant-sync bartvanbenthem/k8s-ntenant-sync:v2
 $ docker image ls
 
 # login and push image to dockerhub repo
 $ docker login "docker.io"
-$ docker push bartvanbenthem/k8s-ntenant:v1
+$ docker push bartvanbenthem/k8s-ntenant-sync:v2
 
 # back to project root
 $ cd ../..
