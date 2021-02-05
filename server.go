@@ -50,11 +50,11 @@ func HandlerProxySync() http.HandlerFunc {
 		w.Header().Add("Content-Type", "application/json")
 		err := sync.Proxy()
 		if err != nil {
-			log.Printf("Proxy sync completed with errors inspect log")
-			io.WriteString(w, `{"proxy":"sync completed with errors inspect log"}`)
+			log.Printf("Proxy sync finished with errors inspect log")
+			io.WriteString(w, `{"proxy":"sync finished with errors inspect log"}`)
 		} else {
-			log.Printf("Proxy sync completed")
-			io.WriteString(w, `{"proxy":" sync completed"}`)
+			log.Printf("Proxy sync finished")
+			io.WriteString(w, `{"proxy":" sync finished"}`)
 		}
 	})
 }
@@ -65,11 +65,11 @@ func HandlerGrafanaSync() http.HandlerFunc {
 		w.Header().Add("Content-Type", "application/json")
 		err := sync.Grafana()
 		if err != nil {
-			log.Printf("Grafana sync completed with errors inspect log")
-			io.WriteString(w, `{"grafana":"sync completed with errors inspect log"}`)
+			log.Printf("Grafana sync finished with errors inspect log")
+			io.WriteString(w, `{"grafana":"sync finished with errors inspect log"}`)
 		} else {
-			log.Printf("Grafana synchronization completed")
-			io.WriteString(w, `{"grafana":" sync completed"}`)
+			log.Printf("Grafana synchronization finished")
+			io.WriteString(w, `{"grafana":" sync finished"}`)
 		}
 	})
 }

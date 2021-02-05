@@ -131,8 +131,25 @@ func UpdateDatasource(ds Datasource) error {
 		log.Printf("Error encoding yaml: %v", err)
 		return err
 	}
-	log.Printf("\nUpdate \"%v\" Grafana Datasource\n", ds.Name)
+	log.Printf("Update \"%v\" Grafana Datasource\n", ds.Name)
 	data, err := RequestAUTH("PUT", url, b)
+	if err != nil {
+		return err
+	}
+	log.Printf("%v\n", string(data))
+	return err
+}
+
+func DeleteDatasource(ds Datasource) error {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("%v/datasources/%v", grafanapi, ds.ID)
+	b, err := json.Marshal(&ds)
+	if err != nil {
+		log.Printf("Error encoding yaml: %v", err)
+		return err
+	}
+	log.Printf("Delete \"%v\" Grafana Datasource\n", ds.Name)
+	data, err := RequestAUTH("DELETE", url, b)
 	if err != nil {
 		return err
 	}

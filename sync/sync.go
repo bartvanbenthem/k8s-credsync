@@ -86,30 +86,42 @@ func Grafana() error {
 		if len(o.Name) == 0 {
 			log.Printf("Organization \"%v\" Cannot be found\n", p.Username)
 		}
+
+		// switch the user context to the correct organization
+		err = grafana.SwitchUserContext(o)
+		if err != nil {
+			log.Printf("%v\n", err)
+			return err
+		}
+
 		ds, err := grafana.GetDatasource(p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
 			return err
 		}
+
 		var datasource grafana.Datasource
-		datasource.Name = p.Username
-		datasource.Type = "loki"
-		datasource.URL = os.Getenv("K8S_PROXY_URL_PORT")
-		datasource.Access = "proxy"
-		datasource.OrgID = o.ID
-		datasource.BasicAuth = true
-		datasource.BasicAuthUser = p.Username
-		datasource.SecureJSONData.BasicAuthPassword = p.Password
 		if len(ds.Name) != 0 {
-			log.Printf("Datasource \"%v\" already exists\n", ds.Name)
-		} else {
-			// switch the user context to the correct organization
-			err = grafana.SwitchUserContext(o)
+			log.Printf("Datasource \"%v\" exists\n", ds.Name)
+			log.Printf("Synchronize \"%v\" password\n", ds.Name)
+			ds.SecureJSONData.BasicAuthPassword = p.Password
+			// update existing datasource 'ds' in the current context
+			err = grafana.UpdateDatasource(ds)
 			if err != nil {
 				log.Printf("%v\n", err)
 				return err
 			}
-			// create datasource in the current context
+		} else {
+			// create datasource object
+			datasource.Name = p.Username
+			datasource.Type = "loki"
+			datasource.URL = os.Getenv("K8S_PROXY_URL_PORT")
+			datasource.Access = "proxy"
+			datasource.OrgID = o.ID
+			datasource.BasicAuth = true
+			datasource.BasicAuthUser = p.Username
+			datasource.SecureJSONData.BasicAuthPassword = p.Password
+			// create a new datasource in the current context
 			err = grafana.CreateDatasource(datasource)
 			if err != nil {
 				log.Printf("%v\n", err)
