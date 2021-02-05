@@ -87,9 +87,9 @@ $ kubectl apply -f build/k8s-ntenant-sync/kubernetes/.
 #### Execute synchronization from webclient
 ```shell
 # test from client
-$ curl http://ntenant
-$ curl http://ntenant/proxy/sync
-$ curl http://ntenant/grafana/sync
+$ curl --resolve ntenant:127.0.0.1 http://ntenant
+$ curl --resolve ntenant:127.0.0.1 http://ntenant/proxy/sync
+$ curl --resolve ntenant:127.0.0.1 http://ntenant/grafana/sync
 
 # view sync logs
 $ kubectl logs k8s-ntenant-sync-
