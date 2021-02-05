@@ -19,37 +19,21 @@ func Contains(source []string, value string) bool {
 }
 
 func Proxy() error {
-	// Update and collect all current tenant credentials
+	// Collect all current tenant credentials
 	tcreds, err := tenant.AllTenantCredentials()
 	if err != nil {
 		log.Printf("%v\n", err)
 		return err
 	}
-	// Update and collect all current proxy credentials
-	pcreds, err := proxy.AllProxyCredentials()
-	if err != nil {
-		log.Printf("%v\n", err)
-		return err
-	}
 
-	// create a slice with all the tenant usernames
-	// slice is used to compare to the current proxy users
-	var usernames []string
-	for _, pc := range pcreds.Users {
-		usernames = append(usernames, pc.Username)
-	}
-
-	// compare tenant credentials with proxy credentials
-	// apply new credentials to the proxy credentials
+	// update proxy config with tenant credentials
+	var pcreds proxy.ProxyCredentials
 	var newcreds proxy.Users
 	for _, tc := range tcreds {
-		b := Contains(usernames, tc.Client.BasicAuth.Username)
-		if b != true {
-			newcreds.Username = tc.Client.BasicAuth.Username
-			newcreds.Password = tc.Client.BasicAuth.Password
-			newcreds.Orgid = tc.Client.BasicAuth.Username
-			pcreds.Users = append(pcreds.Users, newcreds)
-		}
+		newcreds.Username = tc.Client.BasicAuth.Username
+		newcreds.Password = tc.Client.BasicAuth.Password
+		newcreds.Orgid = tc.Client.BasicAuth.Username
+		pcreds.Users = append(pcreds.Users, newcreds)
 	}
 
 	// update proxy kubernetes secret
@@ -59,6 +43,7 @@ func Proxy() error {
 		log.Printf("%v\n", err)
 		return err
 	}
+
 	// restart proxy
 	proxy.RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		os.Getenv("K8S_PROXY_POD_NAME"))
