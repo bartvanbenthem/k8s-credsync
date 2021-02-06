@@ -97,6 +97,6 @@ $ kubectl logs k8s-ntenant-sync-
 
 # TODO
 * Design and create a function for snapshotting the proxy secret before change trough the sync functions.
-* Design and create a update function only for the passwords.
+* Design and create ldap package for automating Grafana LDAP configuration
 
 
