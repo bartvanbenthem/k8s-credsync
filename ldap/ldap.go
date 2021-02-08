@@ -1,12 +1,13 @@
 package ldap
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/bartvanbenthem/k8s-ntenant/kube"
+	"github.com/bartvanbenthem/k8s-ntenant/utils"
+	v1 "k8s.io/api/core/v1"
 )
 
 type GroupMapping struct {
@@ -16,44 +17,36 @@ type GroupMapping struct {
 	OrgRole string
 }
 
-func StringToLines(s string) (lines []string, err error) {
-	scanner := bufio.NewScanner(strings.NewReader(s))
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	err = scanner.Err()
-	return lines, err
-}
-
 func GetAllLDAPGroups(namespace string) map[string]string {
 	ldap := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
 	var kube kube.KubeCLient
-
 	cm := kube.GetConfigmap(kube.CreateClientSet(), namespace, ldap)
-
 	return cm.Data
 }
 
 func GetLDAPGroup(namespace, tenantname string) string {
 	ldap := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
 	var kube kube.KubeCLient
-
 	cm := kube.GetConfigmap(kube.CreateClientSet(), namespace, ldap)
-
 	return cm.Data[tenantname]
 }
 
-func GetLDAPToml(namespace string) ([]string, error) {
+func GetLDAPToml(namespace string) *v1.Secret {
 	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
 	var kube kube.KubeCLient
+	s := kube.GetSecret(kube.CreateClientSet(), namespace, toml)
+	return s
+}
 
+func GetLDAPTomlData(namespace string) ([]string, error) {
+	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
+	var kube kube.KubeCLient
 	s := kube.GetSecretData(kube.CreateClientSet(),
 		namespace, toml, "ldap.toml")
-	cfg, err := StringToLines(fmt.Sprintf("%v", string(s)))
+	cfg, err := utils.StringToLines(fmt.Sprintf("%v", string(s)))
 	if err != nil {
 		return nil, err
 	}
-
 	return cfg, err
 }
 
@@ -68,13 +61,13 @@ func GetOrgIDFromLDAPToml(namespace string, toml []string) []string {
 	return orgids
 }
 
-func UpdateLDAPTomlData(orgid, groupdn string, toml []string) []string {
+func UpdateLDAPTomlData(orgid, groupdn string, tomldata []string) []string {
 	group := GroupMapping{Header: "[[servers.group_mappings]]",
 		GroupDN: groupdn,
 		OrgID:   orgid,
 		OrgRole: "Admin"}
 
-	newtoml := toml
+	newtoml := tomldata
 	newtoml = append(newtoml, group.Header)
 	newtoml = append(newtoml, fmt.Sprintf("group_dn = \"%v\"", group.GroupDN))
 	newtoml = append(newtoml, fmt.Sprintf("org_id = %v", group.OrgID))
@@ -83,4 +76,10 @@ func UpdateLDAPTomlData(orgid, groupdn string, toml []string) []string {
 	return newtoml
 }
 
-func UpdateLDAPTomlSecret(namespace string, toml []byte) {}
+func UpdateLDAPTomlSecret(namespace string, toml *v1.Secret, tomldata []string) *v1.Secret {
+	stom := strings.Join(tomldata, "\n")
+	toml.Data["ldap.toml"] = []byte(stom)
+	var kube kube.KubeCLient
+	kube.UpdateSecret(kube.CreateClientSet(), namespace, toml)
+	return toml
+}

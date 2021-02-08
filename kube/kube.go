@@ -138,5 +138,3 @@ func (k *KubeCLient) DeletePod(c *kubernetes.Clientset, namespace, podname strin
 	log.Printf("Deleted \"%v\" Pod in \"%v\" Namespace\n ",
 		podname, namespace)
 }
-
-func int32Ptr(i int32) *int32 { return &i }

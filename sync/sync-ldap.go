@@ -3,18 +3,11 @@ package sync
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/bartvanbenthem/k8s-ntenant/ldap"
+	"github.com/bartvanbenthem/k8s-ntenant/utils"
 )
-
-func Contains(source []string, value string) bool {
-	for _, item := range source {
-		if item == value {
-			return true
-		}
-	}
-	return false
-}
 
 func LDAP() error {
 	// Get LDAP groups from configmap
@@ -24,19 +17,26 @@ func LDAP() error {
 	// If ORGID !exists; or DN !=; add/replace to LDAP.toml
 
 	nsgrafana := os.Getenv("K8S_GRAFANA_NAMESPACE")
-	group := ldap.GetLDAPGroup(nsgrafana, "team-alpha-dev")
-	fmt.Printf("%v\n", group)
 
-	toml, err := ldap.GetLDAPToml(nsgrafana)
+	tomldata, err := ldap.GetLDAPTomlData(nsgrafana)
+	ids := ldap.GetOrgIDFromLDAPToml(nsgrafana, tomldata)
 
-	id := ldap.GetOrgIDFromLDAPToml(nsgrafana, toml)
-	fmt.Printf("%v\n", id)
+	neworg := strconv.Itoa(77)
+	dn := ldap.GetLDAPGroup(nsgrafana, "team-beta-test")
+	fmt.Printf("%v\n", dn)
 
-	newtoml := ldap.UpdateLDAPTomlData("66",
-		"cn=team alpha-dev,ou=Groups,ou=k8test.nl,ou=Hosting,dc=k8,dc=test,dc=nl",
-		toml)
-	for _, l := range newtoml {
-		fmt.Printf("%v\n", l)
+	if !utils.Contains(ids, neworg) {
+		tomldata, _ = ldap.GetLDAPTomlData(nsgrafana)
+		newdata := ldap.UpdateLDAPTomlData(neworg, dn, tomldata)
+		toml := ldap.GetLDAPToml(nsgrafana)
+		_ = ldap.UpdateLDAPTomlSecret(nsgrafana, toml, newdata)
 	}
+
+	// print updated toml file
+	tomldata, _ = ldap.GetLDAPTomlData(nsgrafana)
+	ids = ldap.GetOrgIDFromLDAPToml(nsgrafana, tomldata)
+	fmt.Printf("%v\n", ids)
+
 	return err
+
 }
