@@ -96,6 +96,16 @@ func (k *KubeCLient) DeleteSecret(c *kubernetes.Clientset, namespace string, sec
 		secret.Name, namespace)
 }
 
+func (k *KubeCLient) GetConfigmap(c *kubernetes.Clientset, namespace, cmname string) *v1.ConfigMap {
+	cm, err := c.CoreV1().ConfigMaps(namespace).Get(context.TODO(), cmname, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("\"%v\" Configmap not found in \"%v\" Namespace\n",
+			cmname, namespace)
+		log.Printf("%v\n", err)
+	}
+	return cm
+}
+
 func (k *KubeCLient) GetAllNamespaceNames(c *kubernetes.Clientset) []string {
 	var namespaces []string
 	ns, err := c.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
