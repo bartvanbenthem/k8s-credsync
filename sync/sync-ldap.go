@@ -2,6 +2,7 @@ package sync
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -15,21 +16,22 @@ func LDAP() error {
 	// Check if ORGID exists in LDAP.toml
 	// Check if DN =; if ORGID exists.
 	// If ORGID !exists; or DN !=; add/replace to LDAP.toml
-
 	nsgrafana := os.Getenv("K8S_GRAFANA_NAMESPACE")
 
 	tomldata, err := ldap.GetLDAPTomlData(nsgrafana)
 	ids := ldap.GetOrgIDFromLDAPToml(nsgrafana, tomldata)
 
-	neworg := strconv.Itoa(77)
+	neworg := strconv.Itoa(44)
 	dn := ldap.GetLDAPGroup(nsgrafana, "team-beta-test")
-	fmt.Printf("%v\n", dn)
 
 	if !utils.Contains(ids, neworg) {
 		tomldata, _ = ldap.GetLDAPTomlData(nsgrafana)
 		newdata := ldap.UpdateLDAPTomlData(neworg, dn, tomldata)
 		toml := ldap.GetLDAPToml(nsgrafana)
 		_ = ldap.UpdateLDAPTomlSecret(nsgrafana, toml, newdata)
+		log.Printf("Added group \"%v\" to ldap.toml with orgid \"%v\"\n", dn, neworg)
+	} else {
+		log.Printf("No Updates regarding the ldap.toml\n")
 	}
 
 	// print updated toml file

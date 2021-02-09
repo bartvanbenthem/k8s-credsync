@@ -55,7 +55,8 @@ func GetOrgIDFromLDAPToml(namespace string, toml []string) []string {
 	for _, l := range toml {
 		if strings.Contains(string(l), "org_id") {
 			id := strings.Split(l, "=")
-			orgids = append(orgids, id[1])
+			orgids = append(orgids,
+				strings.ReplaceAll(id[1], " ", ""))
 		}
 	}
 	return orgids
