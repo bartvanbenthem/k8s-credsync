@@ -19,25 +19,24 @@ func LDAP() error {
 	// If ORGID !exists; or DN !=; add/replace to LDAP.toml
 
 	nsgrafana := os.Getenv("K8S_GRAFANA_NAMESPACE")
-	gm, _ := GetAllMappings(nsgrafana)
-	for _, g := range gm {
-		fmt.Printf("%v : %v\n", g.OrgID, g.GroupDN)
-	}
-
 	tomldata, err := ldap.GetLDAPTomlData(nsgrafana)
 	ids := ldap.GetOrgIDFromLDAPToml(nsgrafana, tomldata)
 
-	neworg := 4
-	dn := ldap.GetLDAPGroup(nsgrafana, "team-beta-test")
+	gs, _ := GetAllMappings(nsgrafana)
+	// update ldap.toml with all new group mappings
+	for _, g := range gs {
+		if !utils.Contains(ids, strconv.Itoa(g.OrgID)) {
+			tomldata, _ = ldap.GetLDAPTomlData(nsgrafana)
+			newdata := ldap.UpdateLDAPTomlData(g.GroupDN,
+				"Admin", "[[servers.group_mappings]]", tomldata, g.OrgID)
+			toml := ldap.GetLDAPToml(nsgrafana)
+			_ = ldap.UpdateLDAPTomlSecret(nsgrafana, toml, newdata)
+			log.Printf("Added group \"%v\" to ldap.toml with orgid \"%v\"\n",
+				g.GroupDN, g.OrgID)
+		} else {
+			log.Printf("No Updates for \"ldap.toml\"\n")
+		}
 
-	if !utils.Contains(ids, strconv.Itoa(neworg)) {
-		tomldata, _ = ldap.GetLDAPTomlData(nsgrafana)
-		newdata := ldap.UpdateLDAPTomlData(dn, "Admin", "[[servers.group_mappings]]", tomldata, neworg)
-		toml := ldap.GetLDAPToml(nsgrafana)
-		_ = ldap.UpdateLDAPTomlSecret(nsgrafana, toml, newdata)
-		log.Printf("Added group \"%v\" to ldap.toml with orgid \"%v\"\n", dn, neworg)
-	} else {
-		log.Printf("No Updates for \"ldap.toml\"\n")
 	}
 
 	// print updated toml file
