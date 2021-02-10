@@ -40,6 +40,11 @@ type Organization struct {
 	} `json:"address"`
 }
 
+type Organizations []struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 func SwitchUserContext(org Organization) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/user/using/%v", grafanapi, org.ID)
@@ -88,6 +93,22 @@ func CreateOrganization(org Organization) error {
 	}
 	log.Printf("%v\n", string(data))
 	return err
+}
+
+func GetAllOrganizations() (Organizations, error) {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("%v/orgs", grafanapi)
+	var orgs Organizations
+	data, err := RequestAUTH("GET", url, []byte(""))
+	if err != nil {
+		return orgs, err
+	}
+	err = json.Unmarshal(data, &orgs)
+	if err != nil {
+		log.Printf("Error encoding yaml: %v", err)
+		return orgs, err
+	}
+	return orgs, err
 }
 
 func GetDatasource(dsname string) (Datasource, error) {

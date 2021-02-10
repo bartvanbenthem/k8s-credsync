@@ -13,7 +13,7 @@ import (
 type GroupMapping struct {
 	Header  string
 	GroupDN string
-	OrgID   string
+	OrgID   int
 	OrgRole string
 }
 
@@ -62,11 +62,11 @@ func GetOrgIDFromLDAPToml(namespace string, toml []string) []string {
 	return orgids
 }
 
-func UpdateLDAPTomlData(orgid, groupdn string, tomldata []string) []string {
-	group := GroupMapping{Header: "[[servers.group_mappings]]",
+func UpdateLDAPTomlData(groupdn, role, header string, tomldata []string, orgid int) []string {
+	group := GroupMapping{Header: header,
 		GroupDN: groupdn,
 		OrgID:   orgid,
-		OrgRole: "Admin"}
+		OrgRole: role}
 
 	newtoml := tomldata
 	newtoml = append(newtoml, group.Header)
