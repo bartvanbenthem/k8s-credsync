@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/bartvanbenthem/k8s-ntenant/grafana"
 	"github.com/bartvanbenthem/k8s-ntenant/ldap"
-	"github.com/bartvanbenthem/k8s-ntenant/utils"
 )
 
 func LDAP() error {
@@ -17,35 +15,45 @@ func LDAP() error {
 	// Check if ORGID exists in LDAP.toml
 	// Check if DN =; if ORGID exists.
 	// If ORGID !exists; or DN !=; add/replace to LDAP.toml
-
 	nsgrafana := os.Getenv("K8S_GRAFANA_NAMESPACE")
-	tomldata, err := ldap.GetLDAPTomlData(nsgrafana)
-	ids := ldap.GetOrgIDFromLDAPToml(nsgrafana, tomldata)
 
-	gs, _ := GetAllMappings(nsgrafana)
-	// update ldap.toml with all new group mappings
-	for _, g := range gs {
-		if !utils.Contains(ids, strconv.Itoa(g.OrgID)) {
-			tomldata, _ = ldap.GetLDAPTomlData(nsgrafana)
-			newdata := ldap.UpdateLDAPTomlData(g.GroupDN,
-				"Admin", "[[servers.group_mappings]]", tomldata, g.OrgID)
-			toml := ldap.GetLDAPToml(nsgrafana)
-			_ = ldap.UpdateLDAPTomlSecret(nsgrafana, toml, newdata)
-			log.Printf("Added group \"%v\" to ldap.toml with orgid \"%v\"\n",
-				g.GroupDN, g.OrgID)
-		} else {
-			log.Printf("No Updates for \"ldap.toml\"\n")
-		}
-
+	gs, err := GetAllMappings(nsgrafana)
+	if err != nil {
+		return err
+	}
+	tomldata, err := ldap.GetLDAPData(nsgrafana)
+	if err != nil {
+		return err
 	}
 
+	// update ldap.toml with all new group mappings
+	var update []string
+	for _, g := range gs {
+		if g.OrgID == 1 {
+			admin := GrafanaAdmin(nsgrafana)
+			newdata := ldap.CreateGroupMappings(admin.GroupDN,
+				"Admin", "[[servers.group_mappings]]", admin.OrgID,
+				admin.GrafanaAdmin)
+			update = append(update, newdata...)
+		} else {
+			newdata := ldap.CreateGroupMappings(g.GroupDN,
+				"Admin", "[[servers.group_mappings]]", g.OrgID, false)
+			update = append(update, newdata...)
+			log.Printf("Append group \"%v\" with orgid \"%v\" to new update\n",
+				g.GroupDN, g.OrgID)
+		}
+	}
+
+	update = append(ldap.CleanMappingsLDAPData(tomldata), update...)
+	toml := ldap.GetLDAPSecret(nsgrafana)
+	_ = ldap.UpdateLDAPSecret(nsgrafana, toml, update)
+
 	// print updated toml file
-	tomldata, _ = ldap.GetLDAPTomlData(nsgrafana)
-	ids = ldap.GetOrgIDFromLDAPToml(nsgrafana, tomldata)
-	fmt.Printf("%v\n", ids)
-
+	tomldata, err = ldap.GetLDAPData(nsgrafana)
+	for _, l := range tomldata {
+		fmt.Printf("%v\n", l)
+	}
 	return err
-
 }
 
 func GetAllMappings(nsgrafana string) ([]ldap.GroupMapping, error) {
@@ -63,4 +71,14 @@ func GetAllMappings(nsgrafana string) ([]ldap.GroupMapping, error) {
 		mappings = append(mappings, mapping)
 	}
 	return mappings, err
+}
+
+func GrafanaAdmin(nsgrafana string) ldap.GroupMapping {
+	var mapping ldap.GroupMapping
+	mapping.GroupDN = ldap.GetLDAPGroup(nsgrafana, "grafana-admin")
+	mapping.OrgID = 1
+	mapping.Header = "[[servers.group_mappings]]"
+	mapping.OrgRole = "Admin"
+	mapping.GrafanaAdmin = true
+	return mapping
 }

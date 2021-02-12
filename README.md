@@ -10,6 +10,7 @@ Multi tenant monitoring and logging solution with credential synchronization on 
 
 ### Requirements
 * The Tenant username should always be identical with the tenant namespace name.
+* Grafana Organization with ID 1 needs to be prestaged for Grafana administrators.
 
 ## Prerequisites
 Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl/

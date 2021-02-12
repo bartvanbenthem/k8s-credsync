@@ -11,10 +11,11 @@ import (
 )
 
 type GroupMapping struct {
-	Header  string
-	GroupDN string
-	OrgID   int
-	OrgRole string
+	Header       string
+	GroupDN      string
+	OrgID        int
+	OrgRole      string
+	GrafanaAdmin bool
 }
 
 func GetAllLDAPGroups(namespace string) map[string]string {
@@ -31,14 +32,14 @@ func GetLDAPGroup(namespace, tenantname string) string {
 	return cm.Data[tenantname]
 }
 
-func GetLDAPToml(namespace string) *v1.Secret {
+func GetLDAPSecret(namespace string) *v1.Secret {
 	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
 	var kube kube.KubeCLient
 	s := kube.GetSecret(kube.CreateClientSet(), namespace, toml)
 	return s
 }
 
-func GetLDAPTomlData(namespace string) ([]string, error) {
+func GetLDAPData(namespace string) ([]string, error) {
 	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
 	var kube kube.KubeCLient
 	s := kube.GetSecretData(kube.CreateClientSet(),
@@ -50,7 +51,7 @@ func GetLDAPTomlData(namespace string) ([]string, error) {
 	return cfg, err
 }
 
-func GetOrgIDFromLDAPToml(namespace string, toml []string) []string {
+func GetOrgIDFromLDAPSecret(namespace string, toml []string) []string {
 	var orgids []string
 	for _, l := range toml {
 		if strings.Contains(string(l), "org_id") {
@@ -62,22 +63,38 @@ func GetOrgIDFromLDAPToml(namespace string, toml []string) []string {
 	return orgids
 }
 
-func UpdateLDAPTomlData(groupdn, role, header string, tomldata []string, orgid int) []string {
-	group := GroupMapping{Header: header,
-		GroupDN: groupdn,
-		OrgID:   orgid,
-		OrgRole: role}
+func CleanMappingsLDAPData(tomldata []string) []string {
+	var n int
+	var lines []int
+	for i := 0; i < len(tomldata); i++ {
+		if tomldata[i] == "[[servers.group_mappings]]" {
+			n = i
+			lines = append(lines, n)
+		}
+	}
 
-	newtoml := tomldata
-	newtoml = append(newtoml, group.Header)
-	newtoml = append(newtoml, fmt.Sprintf("group_dn = \"%v\"", group.GroupDN))
-	newtoml = append(newtoml, fmt.Sprintf("org_id = %v", group.OrgID))
-	newtoml = append(newtoml, fmt.Sprintf("org_role = \"%v\"", group.OrgRole))
-
-	return newtoml
+	ctom := tomldata[:lines[0]]
+	return ctom
 }
 
-func UpdateLDAPTomlSecret(namespace string, toml *v1.Secret, tomldata []string) *v1.Secret {
+func CreateGroupMappings(groupdn, role, header string, orgid int, root bool) []string {
+	group := GroupMapping{Header: header,
+		GroupDN:      groupdn,
+		OrgID:        orgid,
+		OrgRole:      role,
+		GrafanaAdmin: root}
+
+	var groups []string
+	groups = append(groups, group.Header)
+	groups = append(groups, fmt.Sprintf("group_dn = \"%v\"", group.GroupDN))
+	groups = append(groups, fmt.Sprintf("org_id = %v", group.OrgID))
+	groups = append(groups, fmt.Sprintf("org_role = \"%v\"", group.OrgRole))
+	groups = append(groups, fmt.Sprintf("grafana_admin = %v", group.GrafanaAdmin))
+
+	return groups
+}
+
+func UpdateLDAPSecret(namespace string, toml *v1.Secret, tomldata []string) *v1.Secret {
 	stom := strings.Join(tomldata, "\n")
 	toml.Data["ldap.toml"] = []byte(stom)
 	var kube kube.KubeCLient
