@@ -72,7 +72,6 @@ func CleanMappingsLDAPData(tomldata []string) []string {
 			lines = append(lines, n)
 		}
 	}
-
 	ctom := tomldata[:lines[0]]
 	return ctom
 }
