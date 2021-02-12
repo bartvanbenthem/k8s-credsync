@@ -90,7 +90,6 @@ func CreateGroupMappings(groupdn, role, header string, orgid int, root bool) []s
 	groups = append(groups, fmt.Sprintf("org_id = %v", group.OrgID))
 	groups = append(groups, fmt.Sprintf("org_role = \"%v\"", group.OrgRole))
 	groups = append(groups, fmt.Sprintf("grafana_admin = %v", group.GrafanaAdmin))
-
 	return groups
 }
 
