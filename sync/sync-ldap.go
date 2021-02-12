@@ -1,7 +1,6 @@
 package sync
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -10,23 +9,21 @@ import (
 )
 
 func LDAP() error {
-	// Get LDAP groups from configmap
-	// Get Grafana ORG IDs from Grafana API
-	// Check if ORGID exists in LDAP.toml
-	// Check if DN =; if ORGID exists.
-	// If ORGID !exists; or DN !=; add/replace to LDAP.toml
+	// Get Grafana namesace from environment variable
 	nsgrafana := os.Getenv("K8S_GRAFANA_NAMESPACE")
-
+	// Get Grafana ORG IDs from Grafana API
+	// Get LDAP groups from configmap
 	gs, err := GetAllMappings(nsgrafana)
 	if err != nil {
 		return err
 	}
+	// get ldap.toml data from ldap-toml secret
 	tomldata, err := ldap.GetLDAPData(nsgrafana)
 	if err != nil {
 		return err
 	}
 
-	// update ldap.toml with all new group mappings
+	// generate a list of all group mappings
 	var update []string
 	for _, g := range gs {
 		if g.OrgID == 1 {
@@ -35,24 +32,22 @@ func LDAP() error {
 				"Admin", "[[servers.group_mappings]]", admin.OrgID,
 				admin.GrafanaAdmin)
 			update = append(update, newdata...)
+			log.Printf("Append group \"%v\" with orgid \"%v\" to list\n",
+				admin.GroupDN, admin.OrgID)
 		} else {
 			newdata := ldap.CreateGroupMappings(g.GroupDN,
 				"Admin", "[[servers.group_mappings]]", g.OrgID, false)
 			update = append(update, newdata...)
-			log.Printf("Append group \"%v\" with orgid \"%v\" to new update\n",
+			log.Printf("Append group \"%v\" with orgid \"%v\" to list\n",
 				g.GroupDN, g.OrgID)
 		}
 	}
 
+	// update ldap.toml with all new group mappings
 	update = append(ldap.CleanMappingsLDAPData(tomldata), update...)
 	toml := ldap.GetLDAPSecret(nsgrafana)
 	_ = ldap.UpdateLDAPSecret(nsgrafana, toml, update)
 
-	// print updated toml file
-	tomldata, err = ldap.GetLDAPData(nsgrafana)
-	for _, l := range tomldata {
-		fmt.Printf("%v\n", l)
-	}
 	return err
 }
 

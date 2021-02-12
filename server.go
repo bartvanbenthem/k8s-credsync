@@ -19,6 +19,7 @@ func main() {
 	http.HandleFunc("/", HandlerDefault)
 	http.HandleFunc("/proxy/sync", HandlerProxySync())
 	http.HandleFunc("/grafana/sync", HandlerGrafanaSync())
+	http.HandleFunc("/ldap/sync", HandlerLDAPSync())
 
 	// check if certs for tls server are provided
 	if len(cert) != 0 && len(key) != 0 {
@@ -50,7 +51,7 @@ func HandlerProxySync() http.HandlerFunc {
 		w.Header().Add("Content-Type", "application/json")
 		err := sync.Proxy()
 		if err != nil {
-			log.Printf("Proxy sync finished with errors inspect log")
+			log.Printf("Error: %v", err)
 			io.WriteString(w, `{"proxy":"sync finished with errors inspect log"}`)
 		} else {
 			log.Printf("Proxy sync finished")
@@ -65,11 +66,26 @@ func HandlerGrafanaSync() http.HandlerFunc {
 		w.Header().Add("Content-Type", "application/json")
 		err := sync.Grafana()
 		if err != nil {
-			log.Printf("Grafana sync finished with errors inspect log")
+			log.Printf("Error: %v", err)
 			io.WriteString(w, `{"grafana":"sync finished with errors inspect log"}`)
 		} else {
 			log.Printf("Grafana synchronization finished")
 			io.WriteString(w, `{"grafana":" sync finished"}`)
+		}
+	})
+}
+
+// handler for grafana synchronization service
+func HandlerLDAPSync() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		err := sync.LDAP()
+		if err != nil {
+			log.Printf("Error: %v", err)
+			io.WriteString(w, `{"ldap":"sync finished with errors inspect log"}`)
+		} else {
+			log.Printf("LDAP synchronization finished")
+			io.WriteString(w, `{"ldap":" sync finished"}`)
 		}
 	})
 }
