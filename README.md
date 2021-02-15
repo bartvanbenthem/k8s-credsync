@@ -1,5 +1,5 @@
 # k8s-ntenant
-Multi tenant monitoring and logging solution with credential synchronization on the authentication proxies and grafana datasource configurations. Grafana Organizations and Datasources will be provisioned and configured automatically in a multi tenant setup.
+Multi-tenant logging solution with credential synchronization on the authentication proxy and grafana datasource configurations. Grafana Organizations and Datasources will be provisioned and configured automatically in a multi-tenant setup.
 
 ### Technical choices
 * github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
@@ -68,12 +68,12 @@ $ cd build/k8s-ntenant-sync
 $ docker build -t bartvanbenthem/k8s-ntenant-sync .
 
 # tag image
-$ docker tag bartvanbenthem/k8s-ntenant-sync bartvanbenthem/k8s-ntenant-sync:v2
+$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v3
 $ docker image ls
 
 # login and push image to dockerhub repo
 $ docker login "docker.io"
-$ docker push bartvanbenthem/k8s-ntenant-sync:v2
+$ docker push bartvanbenthem/k8s-ntenant-sync:v3
 
 # back to project root
 $ cd ../..
@@ -91,6 +91,7 @@ $ kubectl apply -f build/k8s-ntenant-sync/kubernetes/.
 $ curl --resolve ntenant:127.0.0.1 http://ntenant
 $ curl --resolve ntenant:127.0.0.1 http://ntenant/proxy/sync
 $ curl --resolve ntenant:127.0.0.1 http://ntenant/grafana/sync
+$ curl --resolve ntenant:127.0.0.1 http://ntenant/ldap/sync
 
 # view sync logs
 $ kubectl logs k8s-ntenant-sync-
@@ -98,6 +99,6 @@ $ kubectl logs k8s-ntenant-sync-
 
 # TODO
 * Design and create a function for snapshotting the proxy secret before change trough the sync functions.
-* Design and create ldap sync function for automating Grafana LDAP configuration.
+* Design and create sync function for automatic removal of Grafana organizations
 
 
