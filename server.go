@@ -75,7 +75,7 @@ func HandlerGrafanaSync() http.HandlerFunc {
 	})
 }
 
-// handler for grafana synchronization service
+// handler for ldap synchronization service
 func HandlerLDAPSync() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")

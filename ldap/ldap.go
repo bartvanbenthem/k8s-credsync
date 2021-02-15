@@ -18,6 +18,7 @@ type GroupMapping struct {
 	GrafanaAdmin bool
 }
 
+// get all the groups from the ldap-groups configmap
 func GetAllLDAPGroups(namespace string) map[string]string {
 	ldap := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
 	var kube kube.KubeCLient
@@ -25,6 +26,8 @@ func GetAllLDAPGroups(namespace string) map[string]string {
 	return cm.Data
 }
 
+// get a specific group from the ldap-groups configmap
+// the tenant/namespace name is input for search
 func GetLDAPGroup(namespace, tenantname string) string {
 	ldap := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
 	var kube kube.KubeCLient
@@ -32,6 +35,7 @@ func GetLDAPGroup(namespace, tenantname string) string {
 	return cm.Data[tenantname]
 }
 
+// get ldap-toml secret in given namespace
 func GetLDAPSecret(namespace string) *v1.Secret {
 	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
 	var kube kube.KubeCLient
@@ -39,6 +43,7 @@ func GetLDAPSecret(namespace string) *v1.Secret {
 	return s
 }
 
+// get ldap-toml secret data field in given namespace
 func GetLDAPData(namespace string) ([]string, error) {
 	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
 	var kube kube.KubeCLient
@@ -51,6 +56,7 @@ func GetLDAPData(namespace string) ([]string, error) {
 	return cfg, err
 }
 
+// get all organization ids from the ldap-toml secret
 func GetOrgIDFromLDAPSecret(namespace string, toml []string) []string {
 	var orgids []string
 	for _, l := range toml {
@@ -63,6 +69,8 @@ func GetOrgIDFromLDAPSecret(namespace string, toml []string) []string {
 	return orgids
 }
 
+// clean all the current group mappings from
+// the ldap-toml secret
 func CleanMappingsLDAPData(tomldata []string) []string {
 	var n int
 	var lines []int
@@ -76,6 +84,8 @@ func CleanMappingsLDAPData(tomldata []string) []string {
 	return ctom
 }
 
+// build the new group mappings object containing all the
+// ldap-groups and group mappings for the ldap-toml config
 func CreateGroupMappings(groupdn, role, header string, orgid int, root bool) []string {
 	group := GroupMapping{Header: header,
 		GroupDN:      groupdn,
@@ -92,6 +102,7 @@ func CreateGroupMappings(groupdn, role, header string, orgid int, root bool) []s
 	return groups
 }
 
+// Update the ldap secret with net ldap-toml data
 func UpdateLDAPSecret(namespace string, toml *v1.Secret, tomldata []string) *v1.Secret {
 	stom := strings.Join(tomldata, "\n")
 	toml.Data["ldap.toml"] = []byte(stom)

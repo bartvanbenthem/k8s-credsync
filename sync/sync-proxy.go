@@ -15,7 +15,6 @@ func Proxy() error {
 		log.Printf("%v\n", err)
 		return err
 	}
-
 	// update proxy config with tenant credentials
 	var pcreds proxy.ProxyCredentials
 	var newcreds proxy.Users
@@ -25,7 +24,6 @@ func Proxy() error {
 		newcreds.Orgid = tc.Client.BasicAuth.Username
 		pcreds.Users = append(pcreds.Users, newcreds)
 	}
-
 	// update proxy kubernetes secret
 	err = proxy.UpdateProxySecret(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		"authn.yaml", pcreds)
@@ -33,7 +31,6 @@ func Proxy() error {
 		log.Printf("%v\n", err)
 		return err
 	}
-
 	// restart proxy
 	proxy.RestartProxy(os.Getenv("K8S_PROXY_SECRET_NAMESPACE"),
 		os.Getenv("K8S_PROXY_POD_NAME"))

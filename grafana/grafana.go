@@ -45,6 +45,7 @@ type Organizations []struct {
 	Name string `json:"name"`
 }
 
+// switch to a specific grafana context
 func SwitchUserContext(org Organization) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/user/using/%v", grafanapi, org.ID)
@@ -62,6 +63,7 @@ func SwitchUserContext(org Organization) error {
 	return err
 }
 
+// get a specific grafana organization based on the org name
 func GetOrganization(orgname string) (Organization, error) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/orgs/name/%v", grafanapi, orgname)
@@ -78,6 +80,24 @@ func GetOrganization(orgname string) (Organization, error) {
 	return org, err
 }
 
+// get all the grafana organizations
+func GetAllOrganizations() (Organizations, error) {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	url := fmt.Sprintf("%v/orgs", grafanapi)
+	var orgs Organizations
+	data, err := RequestAUTH("GET", url, []byte(""))
+	if err != nil {
+		return orgs, err
+	}
+	err = json.Unmarshal(data, &orgs)
+	if err != nil {
+		log.Printf("Error encoding yaml: %v", err)
+		return orgs, err
+	}
+	return orgs, err
+}
+
+// create a new grafana organizations
 func CreateOrganization(org Organization) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/orgs", grafanapi)
@@ -95,22 +115,7 @@ func CreateOrganization(org Organization) error {
 	return err
 }
 
-func GetAllOrganizations() (Organizations, error) {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
-	url := fmt.Sprintf("%v/orgs", grafanapi)
-	var orgs Organizations
-	data, err := RequestAUTH("GET", url, []byte(""))
-	if err != nil {
-		return orgs, err
-	}
-	err = json.Unmarshal(data, &orgs)
-	if err != nil {
-		log.Printf("Error encoding yaml: %v", err)
-		return orgs, err
-	}
-	return orgs, err
-}
-
+// get grafana datasource
 func GetDatasource(dsname string) (Datasource, error) {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/datasources/name/%v", grafanapi, dsname)
@@ -127,6 +132,7 @@ func GetDatasource(dsname string) (Datasource, error) {
 	return ds, err
 }
 
+// create a new grafana datasource
 func CreateDatasource(ds Datasource) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/datasources", grafanapi)
@@ -144,6 +150,7 @@ func CreateDatasource(ds Datasource) error {
 	return err
 }
 
+// update existing grafana datasource
 func UpdateDatasource(ds Datasource) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/datasources/%v", grafanapi, ds.ID)
@@ -161,6 +168,7 @@ func UpdateDatasource(ds Datasource) error {
 	return err
 }
 
+// delete grafana datasource
 func DeleteDatasource(ds Datasource) error {
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	url := fmt.Sprintf("%v/datasources/%v", grafanapi, ds.ID)
@@ -178,6 +186,9 @@ func DeleteDatasource(ds Datasource) error {
 	return err
 }
 
+// function for making web requests with basic auth
+// tls will be used when client certs are provided
+// through the environment variables
 func RequestAUTH(method, url string, body []byte) ([]byte, error) {
 	caFile := os.Getenv("K8S_GRAFANA_CA_FILE")
 	var err error

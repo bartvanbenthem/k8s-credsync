@@ -22,7 +22,6 @@ func LDAP() error {
 	if err != nil {
 		return err
 	}
-
 	// generate a list of all group mappings
 	var update []string
 	for _, g := range gs {
@@ -42,22 +41,24 @@ func LDAP() error {
 				g.GroupDN, g.OrgID)
 		}
 	}
-
 	// update ldap.toml with all new group mappings
 	update = append(ldap.CleanMappingsLDAPData(tomldata), update...)
 	toml := ldap.GetLDAPSecret(nsgrafana)
 	_ = ldap.UpdateLDAPSecret(nsgrafana, toml, update)
-
+	// return err
 	return err
 }
 
 func GetAllMappings(nsgrafana string) ([]ldap.GroupMapping, error) {
 	var mapping ldap.GroupMapping
 	var mappings []ldap.GroupMapping
+	// get all the current organizations from the grafana api
 	orgs, err := grafana.GetAllOrganizations()
 	if err != nil {
 		return nil, err
 	}
+	// for every organization get the ldap group from the
+	// ldap-groups config map
 	for _, o := range orgs {
 		mapping.GroupDN = ldap.GetLDAPGroup(nsgrafana, o.Name)
 		mapping.OrgID = o.ID
@@ -65,9 +66,11 @@ func GetAllMappings(nsgrafana string) ([]ldap.GroupMapping, error) {
 		mapping.OrgRole = "Admin"
 		mappings = append(mappings, mapping)
 	}
+	//return all group mappings and err
 	return mappings, err
 }
 
+// build the grafana admin group mapping object
 func GrafanaAdmin(nsgrafana string) ldap.GroupMapping {
 	var mapping ldap.GroupMapping
 	mapping.GroupDN = ldap.GetLDAPGroup(nsgrafana, "grafana-admin")
@@ -75,5 +78,6 @@ func GrafanaAdmin(nsgrafana string) ldap.GroupMapping {
 	mapping.Header = "[[servers.group_mappings]]"
 	mapping.OrgRole = "Admin"
 	mapping.GrafanaAdmin = true
+	// return the admin group mapping
 	return mapping
 }

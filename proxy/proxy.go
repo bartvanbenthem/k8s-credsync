@@ -40,7 +40,7 @@ func UpdateProxySecret(namespace, datafield string, newc ProxyCredentials) error
 	// import required environment variables
 	proxysec := os.Getenv("K8S_PROXY_SECRET_NAME")
 	var kube kube.KubeCLient
-
+	// marshall proxy credentials into byte slice
 	credbyte, err := yaml.Marshal(&newc)
 	if err != nil {
 		log.Printf("Error encoding yaml: %v\n", err)
@@ -50,7 +50,6 @@ func UpdateProxySecret(namespace, datafield string, newc ProxyCredentials) error
 	// get current secret
 	sec := kube.GetSecret(kube.CreateClientSet(), namespace, proxysec)
 	sec.Data[datafield] = credbyte
-
 	// create new secret object
 	var newsecret v1.Secret
 	newsecret.Kind = sec.Kind
@@ -58,7 +57,6 @@ func UpdateProxySecret(namespace, datafield string, newc ProxyCredentials) error
 	newsecret.Data = map[string][]byte{datafield: credbyte}
 	newsecret.Name = sec.Name
 	newsecret.Namespace = sec.Namespace
-
 	// Update auth proxy secret with tenant credentials
 	kube.UpdateSecret(kube.CreateClientSet(), namespace, &newsecret)
 	// get/validate secret

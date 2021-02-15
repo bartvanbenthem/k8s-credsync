@@ -15,6 +15,7 @@ import (
 
 type KubeCLient struct{}
 
+// create a Kubernetes clientset for cluster auth
 func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 	// When running the binary inside of a pod in a cluster,
 	// the kubelet will automatically mount a service account into the container at:
@@ -41,6 +42,7 @@ func (k *KubeCLient) CreateClientSet() *kubernetes.Clientset {
 	return clientset
 }
 
+// get specific kubernetes secret based on the secret name
 func (k *KubeCLient) GetSecret(c *kubernetes.Clientset, namespace, secretname string) *v1.Secret {
 	sec, err := c.CoreV1().Secrets(namespace).Get(context.TODO(), secretname, metav1.GetOptions{})
 	if err != nil {
@@ -51,6 +53,7 @@ func (k *KubeCLient) GetSecret(c *kubernetes.Clientset, namespace, secretname st
 	return sec
 }
 
+// get kubernetes secret data field
 func (k *KubeCLient) GetSecretData(c *kubernetes.Clientset, namespace, secretname, datafield string) []byte {
 	sec, err := c.CoreV1().Secrets(namespace).Get(context.TODO(), secretname, metav1.GetOptions{})
 	if err != nil {
@@ -61,6 +64,7 @@ func (k *KubeCLient) GetSecretData(c *kubernetes.Clientset, namespace, secretnam
 	return sec.Data[datafield]
 }
 
+// update an specific kubernetes secret
 func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
 	sec, err := c.CoreV1().Secrets(namespace).Update(context.TODO(), secret, metav1.UpdateOptions{})
 	if err != nil {
@@ -73,6 +77,7 @@ func (k *KubeCLient) UpdateSecret(c *kubernetes.Clientset, namespace string, sec
 	return sec
 }
 
+// create a new kubernetes secret
 func (k *KubeCLient) CreateSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) *v1.Secret {
 	sec, err := c.CoreV1().Secrets(namespace).Create(context.TODO(), secret, metav1.CreateOptions{})
 	if err != nil {
@@ -85,6 +90,7 @@ func (k *KubeCLient) CreateSecret(c *kubernetes.Clientset, namespace string, sec
 	return sec
 }
 
+// delete kubernetes secret
 func (k *KubeCLient) DeleteSecret(c *kubernetes.Clientset, namespace string, secret *v1.Secret) {
 	deletePolicy := metav1.DeletePropagationForeground
 	err := c.CoreV1().Secrets(namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
@@ -96,6 +102,7 @@ func (k *KubeCLient) DeleteSecret(c *kubernetes.Clientset, namespace string, sec
 		secret.Name, namespace)
 }
 
+// get specific kubernetes configmap based on the configmap name
 func (k *KubeCLient) GetConfigmap(c *kubernetes.Clientset, namespace, cmname string) *v1.ConfigMap {
 	cm, err := c.CoreV1().ConfigMaps(namespace).Get(context.TODO(), cmname, metav1.GetOptions{})
 	if err != nil {
@@ -106,6 +113,7 @@ func (k *KubeCLient) GetConfigmap(c *kubernetes.Clientset, namespace, cmname str
 	return cm
 }
 
+// get all namespace names and return in a slice of type string
 func (k *KubeCLient) GetAllNamespaceNames(c *kubernetes.Clientset) []string {
 	var namespaces []string
 	ns, err := c.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
@@ -118,6 +126,7 @@ func (k *KubeCLient) GetAllNamespaceNames(c *kubernetes.Clientset) []string {
 	return namespaces
 }
 
+// get all pod names and return in a slice of type string
 func (k *KubeCLient) GetAllPodNames(c *kubernetes.Clientset, namespace string) []string {
 	var pods []string
 	ns, err := c.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
@@ -130,6 +139,7 @@ func (k *KubeCLient) GetAllPodNames(c *kubernetes.Clientset, namespace string) [
 	return pods
 }
 
+// delete a specific kubernetes pod based on the podname
 func (k *KubeCLient) DeletePod(c *kubernetes.Clientset, namespace, podname string) {
 	err := c.CoreV1().Pods(namespace).Delete(context.TODO(), podname, metav1.DeleteOptions{})
 	if err != nil {
