@@ -6,7 +6,7 @@ metadata:
   labels:
     app: ldap-toml
 stringData:
-  ldap.toml: |
+  ldap-toml: |
     verbose_logging = true
     [[servers]]
     host = "k8.test.nl"

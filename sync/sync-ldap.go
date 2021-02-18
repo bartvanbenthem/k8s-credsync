@@ -18,7 +18,12 @@ func LDAP() error {
 		return err
 	}
 	// get ldap.toml data from ldap-toml secret
-	tomldata, err := ldap.GetLDAPData(nsgrafana)
+	datakey := os.Getenv("K8S_GRAFANA_LDAP_SECRET_DATA")
+	if len(datakey) == 0 {
+		datakey = "ldap-toml"
+	}
+
+	tomldata, err := ldap.GetLDAPData(nsgrafana, datakey)
 	if err != nil {
 		return err
 	}
@@ -44,7 +49,7 @@ func LDAP() error {
 	// update ldap.toml with all new group mappings
 	update = append(ldap.CleanMappingsLDAPData(tomldata), update...)
 	toml := ldap.GetLDAPSecret(nsgrafana)
-	_ = ldap.UpdateLDAPSecret(nsgrafana, toml, update)
+	_ = ldap.UpdateLDAPSecret(nsgrafana, datakey, toml, update)
 	// return err
 	return err
 }

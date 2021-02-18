@@ -44,11 +44,11 @@ func GetLDAPSecret(namespace string) *v1.Secret {
 }
 
 // get ldap-toml secret data field in given namespace
-func GetLDAPData(namespace string) ([]string, error) {
+func GetLDAPData(namespace, datakey string) ([]string, error) {
 	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
 	var kube kube.KubeCLient
 	s := kube.GetSecretData(kube.CreateClientSet(),
-		namespace, toml, "ldap.toml")
+		namespace, toml, datakey)
 	cfg, err := utils.StringToLines(fmt.Sprintf("%v", string(s)))
 	if err != nil {
 		return nil, err
@@ -103,9 +103,9 @@ func CreateGroupMappings(groupdn, role, header string, orgid int, root bool) []s
 }
 
 // Update the ldap secret with net ldap-toml data
-func UpdateLDAPSecret(namespace string, toml *v1.Secret, tomldata []string) *v1.Secret {
+func UpdateLDAPSecret(namespace, datakey string, toml *v1.Secret, tomldata []string) *v1.Secret {
 	stom := strings.Join(tomldata, "\n")
-	toml.Data["ldap.toml"] = []byte(stom)
+	toml.Data[datakey] = []byte(stom)
 	var kube kube.KubeCLient
 	kube.UpdateSecret(kube.CreateClientSet(), namespace, toml)
 	return toml

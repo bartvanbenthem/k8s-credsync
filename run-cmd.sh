@@ -16,6 +16,7 @@ export K8S_GRAFANA_API_URL='grafanatls/api'
 export K8S_GRAFANA_CA_FILE='build/k8s-ntenant-sync/cert/grafana/rootCA.crt'
 export K8S_GRAFANA_NAMESPACE='co-monitoring'
 export K8S_GRAFANA_LDAP_SECRET='ldap-toml'
+export K8S_GRAFANA_LDAP_SECRET_DATA='ldap-toml'
 export K8S_GRAFANA_LDAP_GROUPS='grafana-ldap-groups'
 
 # create build
