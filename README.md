@@ -68,12 +68,12 @@ $ cd build/k8s-ntenant-sync
 $ docker build -t bartvanbenthem/k8s-ntenant-sync .
 
 # tag image
-$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v3
+$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v4
 $ docker image ls
 
 # login and push image to dockerhub repo
 $ docker login "docker.io"
-$ docker push bartvanbenthem/k8s-ntenant-sync:v3
+$ docker push bartvanbenthem/k8s-ntenant-sync:v4
 
 # back to project root
 $ cd ../..
