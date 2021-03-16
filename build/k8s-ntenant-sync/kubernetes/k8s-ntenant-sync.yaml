@@ -35,7 +35,7 @@ data:
   K8S_TENANT_SECRET_NAME: log-recolector-config
   K8S_PROXY_POD_NAME: loki-multi-tenant-proxy-
   K8S_PROXY_URL_PORT: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100
-  K8S_GRAFANA_API_URL: co-prometheus-grafana.co-monitoring.svc.cluster.local:80/api
+  K8S_GRAFANA_API_URL: grafana.co-monitoring.svc.cluster.local:80/api
   K8S_GRAFANA_NAMESPACE: co-monitoring 
   K8S_GRAFANA_LDAP_SECRET: ldap-toml
   K8S_GRAFANA_LDAP_SECRET_DATA: ldap-toml #v4
