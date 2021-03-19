@@ -28,7 +28,7 @@ $ helm install grafana --namespace=co-monitoring grafana/grafana
 # grafana password
 $ kubectl get secret --namespace co-monitoring grafana \
   -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-# change password to prom-operator to run example 
+# change password to prom-operator to run example without adjustments in the manifests
 ```
 
 ## Install and run
