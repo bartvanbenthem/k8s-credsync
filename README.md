@@ -1,5 +1,5 @@
 # k8s-ntenant
-Multi-tenant logging solution with credential synchronization. Grafana Organizations, Datasources and LDAP integrations will be provisioned and configured automatically in a multi-tenant setup.
+Multi-tenant logging solution with credential synchronization. Grafana is provisioned and configured automatically in a multi-tenant setup.
 
 ### Technical choices
 * github.com/boz/kail is used for log streaming.
