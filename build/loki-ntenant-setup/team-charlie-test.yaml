@@ -9,10 +9,11 @@ stringData:
       http_listen_port: 9080
       grpc_listen_port: 0
     client:
-      url: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100/api/prom/push
+      url: http://loki.co-monitoring.svc.cluster.local:3100/api/prom/push
       basic_auth:
         username: team-charlie-test
-        password: DD5SACCkCCfsdd4358N
+        password: 
+      tenant_id: DD5SACCkCCfsdd4358NDD5
     scrape_configs:
       - job_name: containers
         static_configs:

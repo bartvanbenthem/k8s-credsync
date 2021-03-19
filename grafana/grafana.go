@@ -2,8 +2,6 @@ package grafana
 
 import (
 	"bytes"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -14,15 +12,20 @@ import (
 )
 
 type Datasource struct {
-	Name           string `json:"name"`
-	ID             int    `json:id`
-	Type           string `json:"type"`
-	URL            string `json:"url"`
-	Access         string `json:"access"`
-	OrgID          int    `json:"orgId"`
-	BasicAuth      bool   `json:"basicAuth"`
-	BasicAuthUser  string `json:"basicAuthUser"`
+	Name          string `json:"name"`
+	ID            int    `json:id`
+	Type          string `json:"type"`
+	URL           string `json:"url"`
+	Access        string `json:"access"`
+	OrgID         int    `json:"orgId"`
+	BasicAuth     bool   `json:"basicAuth"`
+	BasicAuthUser string `json:"basicAuthUser"`
+	ReadOnly      bool   `json: "readOnly"`
+	JSONData      struct {
+		HTTPHeaderName1 string `json:"httpHeaderName1"`
+	} `json:"jsonData"`
 	SecureJSONData struct {
+		HTTPHeaderValue1  string `json:"httpHeaderValue1"`
 		BasicAuthPassword string `json:"basicAuthPassword"`
 	} `json:"secureJsonData"`
 }
@@ -187,41 +190,16 @@ func DeleteDatasource(ds Datasource) error {
 }
 
 // function for making web requests with basic auth
-// tls will be used when client certs are provided
-// through the environment variables
 func RequestAUTH(method, url string, body []byte) ([]byte, error) {
-	caFile := os.Getenv("K8S_GRAFANA_CA_FILE")
 	var err error
 	var client *http.Client
 	var req *http.Request
-	if len(caFile) == 0 {
-		client = &http.Client{
-			Timeout: time.Second * 10,
-		}
-		url := fmt.Sprintf("http://%v", url)
-		req, err = http.NewRequest(method, url,
-			bytes.NewBuffer(body))
-	} else {
-		caCert, err := ioutil.ReadFile(caFile)
-		if err != nil {
-			log.Printf("FATAL ERROR: %v\n", err)
-			return nil, err
-		}
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(caCert)
-
-		client = &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					RootCAs:            caCertPool,
-					InsecureSkipVerify: true, // enable for self signed certificates
-				},
-			},
-		}
-		tls := fmt.Sprintf("https://%v", url)
-		req, err = http.NewRequest(method, tls,
-			bytes.NewBuffer(body))
+	client = &http.Client{
+		Timeout: time.Second * 10,
 	}
+
+	req, err = http.NewRequest(method, url,
+		bytes.NewBuffer(body))
 
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {

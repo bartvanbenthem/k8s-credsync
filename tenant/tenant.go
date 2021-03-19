@@ -18,6 +18,7 @@ type TenantCredential struct {
 			Username string `yaml:"username"`
 			Password string `yaml:"password"`
 		} `yaml:"basic_auth"`
+		TenantID string `yaml:"tenant_id"`
 	} `yaml:"client"`
 	ScrapeConfigs []struct {
 		JobName       string `yaml:"job_name"`
@@ -63,7 +64,7 @@ func AllTenantCredentials() ([]TenantCredential, error) {
 	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
 	// initiate kube client
 	var kube kube.KubeCLient
-	//set slice of tenant credential
+	//create slice of tenant credential
 	var tcreds []TenantCredential
 
 	namespaces := kube.GetAllNamespaceNames(kube.CreateClientSet())

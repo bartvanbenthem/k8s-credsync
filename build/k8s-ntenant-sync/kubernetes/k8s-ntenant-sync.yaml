@@ -30,15 +30,15 @@ kind: ConfigMap
 metadata:
   name: k8s-ntenant-config
 data:
-  K8S_PROXY_SECRET_NAME: loki-multi-tenant-proxy-auth-config
-  K8S_PROXY_SECRET_NAMESPACE: co-monitoring
+  K8S_CRED_SECRET_NAME: loki-ntenant-credentials
+  K8S_CRED_SECRET_NAMESPACE: co-monitoring
   K8S_TENANT_SECRET_NAME: log-recolector-config
-  K8S_PROXY_POD_NAME: loki-multi-tenant-proxy-
-  K8S_PROXY_URL_PORT: http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100
-  K8S_GRAFANA_API_URL: grafana.co-monitoring.svc.cluster.local:80/api
+  K8S_DATASOURCE_BASIC_AUTH: "false"
+  K8S_LOKI_URL_PORT: http://loki.co-monitoring.svc.cluster.local:3100
+  K8S_GRAFANA_API_URL: http://grafana.co-monitoring.svc.cluster.local:80/api
   K8S_GRAFANA_NAMESPACE: co-monitoring 
   K8S_GRAFANA_LDAP_SECRET: ldap-toml
-  K8S_GRAFANA_LDAP_SECRET_DATA: ldap-toml #v4
+  K8S_GRAFANA_LDAP_SECRET_DATA: ldap-toml 
   K8S_GRAFANA_LDAP_GROUPS: grafana-ldap-groups 
   K8S_SERVER_ADDRESS: 0.0.0.0:3111 # address and port for the sync server
 ---
@@ -61,7 +61,7 @@ spec:
       serviceAccountName: k8s-ntenant-sa
       containers:
       - name: k8s-ntenant-sync
-        image: bartvanbenthem/k8s-ntenant-sync:v4 
+        image: bartvanbenthem/k8s-ntenant-sync:v5 
         env:
           - name: K8S_GRAFANA_BA_USER
             valueFrom:

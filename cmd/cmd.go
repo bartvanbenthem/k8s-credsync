@@ -9,7 +9,7 @@ import (
 func main() {
 	var err error
 	//Start the tenant 2 proxy sync
-	err = sync.Proxy()
+	err = sync.Credential()
 	if err != nil {
 		log.Printf("%v\n", err)
 	}

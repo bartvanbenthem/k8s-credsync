@@ -4,20 +4,20 @@ import (
 	"log"
 	"os"
 
+	"github.com/bartvanbenthem/k8s-ntenant/credential"
 	"github.com/bartvanbenthem/k8s-ntenant/grafana"
-	"github.com/bartvanbenthem/k8s-ntenant/proxy"
 )
 
 func Grafana() error {
 	// Collect all current proxy credentials
-	pcreds, err := proxy.AllProxyCredentials()
+	creds, err := credential.AllCredentials()
 	if err != nil {
 		log.Printf("%v\n", err)
 		return err
 	}
 
 	// Scan and Create Organizations
-	for _, p := range pcreds.Users {
+	for _, p := range creds.Users {
 		o, err := grafana.GetOrganization(p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
@@ -32,7 +32,7 @@ func Grafana() error {
 	}
 
 	// Scan an create datasources
-	for _, p := range pcreds.Users {
+	for _, p := range creds.Users {
 		o, err := grafana.GetOrganization(p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
@@ -70,12 +70,18 @@ func Grafana() error {
 			// create datasource object
 			datasource.Name = p.Username
 			datasource.Type = "loki"
-			datasource.URL = os.Getenv("K8S_PROXY_URL_PORT")
+			datasource.URL = os.Getenv("K8S_LOKI_URL_PORT")
 			datasource.Access = "proxy"
 			datasource.OrgID = o.ID
-			datasource.BasicAuth = true
-			datasource.BasicAuthUser = p.Username
-			datasource.SecureJSONData.BasicAuthPassword = p.Password
+			datasource.BasicAuth = false
+			datasource.ReadOnly = false
+			if os.Getenv("K8S_DATASOURCE_BASIC_AUTH") == "true" {
+				datasource.BasicAuthUser = p.Username
+				datasource.SecureJSONData.BasicAuthPassword = p.Password
+				datasource.BasicAuth = true
+			}
+			datasource.JSONData.HTTPHeaderName1 = "X-Scope-OrgID"
+			datasource.SecureJSONData.HTTPHeaderValue1 = p.TenantID
 			// create a new datasource in the current context
 			err = grafana.CreateDatasource(datasource)
 			if err != nil {

@@ -17,7 +17,7 @@ func main() {
 
 	// http handler functions
 	http.HandleFunc("/", HandlerDefault)
-	http.HandleFunc("/proxy/sync", HandlerProxySync())
+	http.HandleFunc("/credential/sync", HandlerCredentialSync())
 	http.HandleFunc("/grafana/sync", HandlerGrafanaSync())
 	http.HandleFunc("/ldap/sync", HandlerLDAPSync())
 
@@ -45,17 +45,17 @@ func HandlerDefault(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, `{"server":"running"}`)
 }
 
-// handler for proxy synchronization service
-func HandlerProxySync() http.HandlerFunc {
+// handler for credential synchronization service
+func HandlerCredentialSync() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		err := sync.Proxy()
+		err := sync.Credential()
 		if err != nil {
 			log.Printf("Error: %v", err)
-			io.WriteString(w, `{"proxy":"sync finished with errors inspect log"}`)
+			io.WriteString(w, `{"credential":"sync finished with errors inspect log"}`)
 		} else {
-			log.Printf("Proxy sync finished")
-			io.WriteString(w, `{"proxy":" sync finished"}`)
+			log.Printf("credential sync finished")
+			io.WriteString(w, `{"credential":" sync finished"}`)
 		}
 	})
 }

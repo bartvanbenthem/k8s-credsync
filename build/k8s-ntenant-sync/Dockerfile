@@ -13,7 +13,6 @@ WORKDIR /app
 COPY ./bin/k8s-ntenant ./
 # create dirs for tls files when tls is required
 RUN mkdir -p cert/server
-RUN mkdir -p cert/grafana
 RUN mkdir kubeconfig
 
 # Expose port 3111 to the outside world

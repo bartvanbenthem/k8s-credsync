@@ -1,15 +1,14 @@
 # k8s-ntenant
-Multi-tenant logging solution with credential synchronization on the authentication proxy and grafana datasource configurations. Grafana Organizations and Datasources will be provisioned and configured automatically in a multi-tenant setup.
+Multi-tenant logging solution with credential synchronization. Grafana Organizations, Datasources and LDAP integrations will be provisioned and configured automatically in a multi-tenant setup.
 
 ### Technical choices
-* github.com/k8spin/loki-multi-tenant-proxy is used as Loki auth proxy.
 * github.com/boz/kail is used for log streaming.
 * go-client sdk is used to interract with the kubernetes API.
-* A custom tls client with basic auth is used to interract with the Grafana API.
+* A custom client with basic auth is used to interract with the Grafana API.
 * Environment variables are set for dynamic configuration parameters.
 
 ### Requirements
-* The Tenant username should always be identical with the tenant namespace name.
+* The Tenant username is a required field and should always be identical with the tenant namespace name.
 * Grafana Organization with ID 1 needs to be prestaged for Grafana administrators.
 
 ## Prerequisites
@@ -27,17 +26,7 @@ $ helm install grafana --namespace=co-monitoring grafana/grafana
 # grafana password
 $ kubectl get secret --namespace co-monitoring grafana \
   -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-
-# create secret with the grafanatls certificates
-$ kubectl create secret tls grafanatls-secret \
-   --cert=build/k8s-ntenant-sync/cert/grafana/grafanatls.crt \
-   --key=build/k8s-ntenant-sync/cert/grafana/grafanatls.key \
-   --namespace co-monitoring
-$ kubectl describe secret grafanatls-secret --namespace co-monitoring
-
-# expose grafanatls trough the ingress controller
-$ kubectl apply -f build/k8s-ntenant-sync/cert/grafana/grafana-tls.yaml
-# make sure the grafanatls hostname is resolvable to the Loadbalancer/node
+# change password to prom-operator to run example 
 ```
 
 ## Install and run
@@ -48,7 +37,7 @@ $ git clone https://github.com/bartvanbenthem/k8s-ntenant.git
 $ cd k8s-ntenant
 ```
 
-### Deploy Loki with authentication proxy on Kubernetes
+### Deploy Loki on Kubernetes
 ```shell
 # create required namespaces
 $ kubectl create namespace 'co-monitoring'
@@ -56,9 +45,9 @@ $ kubectl create namespace 'team-alpha-dev'
 $ kubectl create namespace 'team-beta-test'
 $ kubectl create namespace 'team-charlie-test'
 
-# apply the loki multi tenant setup and print the datasource url
+# deploy loki multi-tenant
 $ kubectl apply -f build/loki-ntenant-setup/.
-$ echo 'http://loki-multi-tenant-proxy.co-monitoring.svc.cluster.local:3100'
+
 ```
 
 ### Build k8s-ntenant-sync container and push to repo
@@ -68,12 +57,12 @@ $ cd build/k8s-ntenant-sync
 $ docker build -t bartvanbenthem/k8s-ntenant-sync .
 
 # tag image
-$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v4
+$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v5
 $ docker image ls
 
 # login and push image to dockerhub repo
 $ docker login "docker.io"
-$ docker push bartvanbenthem/k8s-ntenant-sync:v4
+$ docker push bartvanbenthem/k8s-ntenant-sync:v5
 
 # back to project root
 $ cd ../..
@@ -89,7 +78,7 @@ $ kubectl apply -f build/k8s-ntenant-sync/kubernetes/.
 ```shell
 # test from client
 $ curl --resolve ntenant:127.0.0.1 http://ntenant
-$ curl --resolve ntenant:127.0.0.1 http://ntenant/proxy/sync
+$ curl --resolve ntenant:127.0.0.1 http://ntenant/credential/sync
 $ curl --resolve ntenant:127.0.0.1 http://ntenant/grafana/sync
 $ curl --resolve ntenant:127.0.0.1 http://ntenant/ldap/sync
 
@@ -98,7 +87,7 @@ $ kubectl logs k8s-ntenant-sync-
 ```
 
 # TODO
-* Design and create a function for snapshotting the proxy secret before change trough the sync functions.
-* Design and create sync function for automatic removal of Grafana organizations
+* Design and create sync function for automatic removal of Grafana organization when a tenant is removed from the cluster.
+* Design and create function for updating organization ids in the loki-ntenant-credentials after the organization has been created in grafana.
 
 

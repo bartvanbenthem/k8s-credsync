@@ -5,13 +5,13 @@ import (
 	"log"
 	"testing"
 
-	"github.com/bartvanbenthem/k8s-ntenant/proxy"
+	"github.com/bartvanbenthem/k8s-ntenant/credential"
 	"github.com/bartvanbenthem/k8s-ntenant/tenant"
 )
 
-func TestGetProxyCredentials(t *testing.T) {
+func TestGetCredentials(t *testing.T) {
 	// Prints the current proxycredentials
-	pcurrent, err := proxy.AllProxyCredentials()
+	pcurrent, err := credential.AllCredentials()
 	if err != nil {
 		log.Printf("%v\n", err)
 	}
@@ -34,7 +34,7 @@ func TestMainFunctions(t *testing.T) {
 	}
 
 	// Prints the current proxycredentials
-	pcurrent, err := proxy.AllProxyCredentials()
+	pcurrent, err := credential.AllCredentials()
 	if err != nil {
 		log.Printf("%v\n", err)
 	}

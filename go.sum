@@ -52,6 +52,8 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdko
 github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
 github.com/bartvanbenthem/k8s-credsync v0.0.0-20210103080235-6b34839608e0 h1:cnOb52RPvj/DeRmhdxJWPR2F9hIm2sXBQU49o4gwLoI=
 github.com/bartvanbenthem/k8s-credsync v0.0.0-20210103080235-6b34839608e0/go.mod h1:JTxrIhhdX3hIKtw26SzhE8B4FyU59tukR3CwqgOjLV4=
+github.com/bartvanbenthem/k8s-ntenant v0.0.0-20210316145134-7d906a24bb98 h1:yQD482Wyr+DM68DrY9YbOry9/FxSbTUyHE/QlYaR1XE=
+github.com/bartvanbenthem/k8s-ntenant v0.0.0-20210316145134-7d906a24bb98/go.mod h1:gEyyqLGKfPw5SUKtBiOFZHyHoEs6Qnfxu3XTp9aFij8=
 github.com/bartvanbenthem/k8s-ntenant-sync v0.0.0-20210113154105-8f25d49876b6 h1:4/pidwc4JolVXnwPyySkMsdGcZMcUCZgo66WBYxBLnI=
 github.com/bartvanbenthem/k8s-ntenant-sync v0.0.0-20210113154105-8f25d49876b6/go.mod h1:rkj7+kerCvk7Wp3p0UHvkMFp4yNFzbX16icTSU3BvDI=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
