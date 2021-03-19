@@ -1,7 +1,6 @@
 # k8s-ntenant
 Multi-tenant logging solution with credential synchronization. Grafana is provisioned and configured automatically in a multi-tenant setup.
 
-### Topology
 ![topology](/00-img/20210320-k8s-ntentant.png)
 
 ### Technical choices
