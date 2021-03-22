@@ -9,8 +9,12 @@ import (
 )
 
 func Grafana() error {
+	// get environment variable
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	csec := os.Getenv("K8S_CRED_SECRET_NAME")
+	cns := os.Getenv("K8S_CRED_SECRET_NAMESPACE")
 	// Collect all current proxy credentials
-	creds, err := credential.AllCredentials()
+	creds, err := credential.AllCredentials(cns, csec)
 	if err != nil {
 		log.Printf("%v\n", err)
 		return err
@@ -18,7 +22,7 @@ func Grafana() error {
 
 	// Scan and Create Organizations
 	for _, p := range creds.Users {
-		o, err := grafana.GetOrganization(p.Username)
+		o, err := grafana.GetOrganization(grafanapi, p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
 		}
@@ -27,13 +31,13 @@ func Grafana() error {
 		} else {
 			log.Printf("Organization \"%v\" does not exist\n", p)
 			organization := grafana.Organization{Name: p.Username}
-			grafana.CreateOrganization(organization)
+			grafana.CreateOrganization(grafanapi, organization)
 		}
 	}
 
 	// Scan an create datasources
 	for _, p := range creds.Users {
-		o, err := grafana.GetOrganization(p.Username)
+		o, err := grafana.GetOrganization(grafanapi, p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
 			return err
@@ -43,13 +47,13 @@ func Grafana() error {
 		}
 
 		// switch the user context to the correct organization
-		err = grafana.SwitchUserContext(o)
+		err = grafana.SwitchUserContext(grafanapi, o)
 		if err != nil {
 			log.Printf("%v\n", err)
 			return err
 		}
 
-		ds, err := grafana.GetDatasource(p.Username)
+		ds, err := grafana.GetDatasource(grafanapi, p.Username)
 		if err != nil {
 			log.Printf("%v\n", err)
 			return err
@@ -61,7 +65,7 @@ func Grafana() error {
 			log.Printf("Synchronize \"%v\" password\n", ds.Name)
 			ds.SecureJSONData.BasicAuthPassword = p.Password
 			// update existing datasource 'ds' in the current context
-			err = grafana.UpdateDatasource(ds)
+			err = grafana.UpdateDatasource(grafanapi, ds)
 			if err != nil {
 				log.Printf("%v\n", err)
 				return err
@@ -83,7 +87,7 @@ func Grafana() error {
 			datasource.JSONData.HTTPHeaderName1 = "X-Scope-OrgID"
 			datasource.SecureJSONData.HTTPHeaderValue1 = p.TenantID
 			// create a new datasource in the current context
-			err = grafana.CreateDatasource(datasource)
+			err = grafana.CreateDatasource(grafanapi, datasource)
 			if err != nil {
 				log.Printf("%v\n", err)
 				return err

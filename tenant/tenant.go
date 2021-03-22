@@ -1,8 +1,6 @@
 package tenant
 
 import (
-	"os"
-
 	"github.com/bartvanbenthem/k8s-ntenant/kube"
 	"gopkg.in/yaml.v2"
 )
@@ -58,10 +56,8 @@ func GetTenantCredential(file string) (TenantCredential, error) {
 }
 
 // collects all tenant credentials
-func AllTenantCredentials() ([]TenantCredential, error) {
+func AllTenantCredentials(tenantsecret string) ([]TenantCredential, error) {
 	var err error
-	// import environment variable
-	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
 	// initiate kube client
 	var kube kube.KubeCLient
 	//create slice of tenant credential
@@ -71,7 +67,7 @@ func AllTenantCredentials() ([]TenantCredential, error) {
 	for _, ns := range namespaces {
 		var c TenantCredential
 		s := kube.GetSecretData(kube.CreateClientSet(),
-			ns, tenantsec, "promtail.yaml")
+			ns, tenantsecret, "promtail.yaml")
 		if len(s) != 0 {
 			err = yaml.Unmarshal(s, &c)
 			if err != nil {

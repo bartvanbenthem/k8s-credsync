@@ -9,8 +9,9 @@ import (
 )
 
 func LDAP() error {
-	// Get Grafana namesace from environment variable
+	// Get environment variables
 	nsgrafana := os.Getenv("K8S_GRAFANA_NAMESPACE")
+	tomlsecret := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
 	// Get Grafana ORG IDs from Grafana API
 	// Get LDAP groups from configmap
 	gs, err := GetAllMappings(nsgrafana)
@@ -23,7 +24,7 @@ func LDAP() error {
 		datakey = "ldap-toml"
 	}
 
-	tomldata, err := ldap.GetLDAPData(nsgrafana, datakey)
+	tomldata, err := ldap.GetLDAPData(nsgrafana, tomlsecret, datakey)
 	if err != nil {
 		return err
 	}
@@ -48,24 +49,26 @@ func LDAP() error {
 	}
 	// update ldap.toml with all new group mappings
 	update = append(ldap.CleanMappingsLDAPData(tomldata), update...)
-	toml := ldap.GetLDAPSecret(nsgrafana)
+	toml := ldap.GetLDAPSecret(nsgrafana, tomlsecret)
 	_ = ldap.UpdateLDAPSecret(nsgrafana, datakey, toml, update)
 	// return err
 	return err
 }
 
 func GetAllMappings(nsgrafana string) ([]ldap.GroupMapping, error) {
+	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+	ldapgroups := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
 	var mapping ldap.GroupMapping
 	var mappings []ldap.GroupMapping
 	// get all the current organizations from the grafana api
-	orgs, err := grafana.GetAllOrganizations()
+	orgs, err := grafana.GetAllOrganizations(grafanapi)
 	if err != nil {
 		return nil, err
 	}
 	// for every organization get the ldap group from the
 	// ldap-groups config map
 	for _, o := range orgs {
-		mapping.GroupDN = ldap.GetLDAPGroup(nsgrafana, o.Name)
+		mapping.GroupDN = ldap.GetLDAPGroup(nsgrafana, o.Name, ldapgroups)
 		mapping.OrgID = o.ID
 		mapping.Header = "[[servers.group_mappings]]"
 		mapping.OrgRole = "Admin"
@@ -77,8 +80,9 @@ func GetAllMappings(nsgrafana string) ([]ldap.GroupMapping, error) {
 
 // build the grafana admin group mapping object
 func GrafanaAdmin(nsgrafana string) ldap.GroupMapping {
+	ldapgroups := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
 	var mapping ldap.GroupMapping
-	mapping.GroupDN = ldap.GetLDAPGroup(nsgrafana, "grafana-admin")
+	mapping.GroupDN = ldap.GetLDAPGroup(nsgrafana, "grafana-admin", ldapgroups)
 	mapping.OrgID = 1
 	mapping.Header = "[[servers.group_mappings]]"
 	mapping.OrgRole = "Admin"

@@ -2,7 +2,6 @@ package ldap
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/bartvanbenthem/k8s-ntenant/kube"
@@ -19,36 +18,32 @@ type GroupMapping struct {
 }
 
 // get all the groups from the ldap-groups configmap
-func GetAllLDAPGroups(namespace string) map[string]string {
-	ldap := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
+func GetAllLDAPGroups(namespace, ldapgroups string) map[string]string {
 	var kube kube.KubeCLient
-	cm := kube.GetConfigmap(kube.CreateClientSet(), namespace, ldap)
+	cm := kube.GetConfigmap(kube.CreateClientSet(), namespace, ldapgroups)
 	return cm.Data
 }
 
 // get a specific group from the ldap-groups configmap
 // the tenant/namespace name is input for search
-func GetLDAPGroup(namespace, tenantname string) string {
-	ldap := os.Getenv("K8S_GRAFANA_LDAP_GROUPS")
+func GetLDAPGroup(namespace, tenantname, ldapgroups string) string {
 	var kube kube.KubeCLient
-	cm := kube.GetConfigmap(kube.CreateClientSet(), namespace, ldap)
+	cm := kube.GetConfigmap(kube.CreateClientSet(), namespace, ldapgroups)
 	return cm.Data[tenantname]
 }
 
 // get ldap-toml secret in given namespace
-func GetLDAPSecret(namespace string) *v1.Secret {
-	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
+func GetLDAPSecret(namespace, tomlsecret string) *v1.Secret {
 	var kube kube.KubeCLient
-	s := kube.GetSecret(kube.CreateClientSet(), namespace, toml)
+	s := kube.GetSecret(kube.CreateClientSet(), namespace, tomlsecret)
 	return s
 }
 
 // get ldap-toml secret data field in given namespace
-func GetLDAPData(namespace, datakey string) ([]string, error) {
-	toml := os.Getenv("K8S_GRAFANA_LDAP_SECRET")
+func GetLDAPData(namespace, tomlsecret, datakey string) ([]string, error) {
 	var kube kube.KubeCLient
 	s := kube.GetSecretData(kube.CreateClientSet(),
-		namespace, toml, datakey)
+		namespace, tomlsecret, datakey)
 	cfg, err := utils.StringToLines(fmt.Sprintf("%v", string(s)))
 	if err != nil {
 		return nil, err

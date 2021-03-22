@@ -2,7 +2,6 @@ package credential
 
 import (
 	"log"
-	"os"
 
 	"github.com/bartvanbenthem/k8s-ntenant/kube"
 	"gopkg.in/yaml.v2"
@@ -12,7 +11,7 @@ import (
 type Users struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
-	Orgid    string `yaml:"orgid"`
+	Orgid    int    `yaml:"orgid"`
 	TenantID string `yaml:"tenantid"`
 }
 
@@ -20,7 +19,7 @@ type Credentials struct {
 	Users []struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
-		Orgid    string `yaml:"orgid"`
+		Orgid    int    `yaml:"orgid"`
 		TenantID string `yaml:"tenantid"`
 	} `yaml:"users"`
 }
@@ -37,9 +36,7 @@ func GetCredentials(file string) (Credentials, error) {
 	return c, err
 }
 
-func UpdateCredentialSecret(namespace, datafield string, newc Credentials) error {
-	// import required environment variables
-	csec := os.Getenv("K8S_CRED_SECRET_NAME")
+func UpdateCredentialSecret(namespace, secret, datafield string, newc Credentials) error {
 	var kube kube.KubeCLient
 	// marshall proxy credentials into byte slice
 	credbyte, err := yaml.Marshal(&newc)
@@ -49,7 +46,7 @@ func UpdateCredentialSecret(namespace, datafield string, newc Credentials) error
 	}
 
 	// get current secret
-	sec := kube.GetSecret(kube.CreateClientSet(), namespace, csec)
+	sec := kube.GetSecret(kube.CreateClientSet(), namespace, secret)
 	sec.Data[datafield] = credbyte
 	// create new secret object
 	var newsecret v1.Secret
@@ -66,17 +63,14 @@ func UpdateCredentialSecret(namespace, datafield string, newc Credentials) error
 }
 
 // collects all credentials
-func AllCredentials() (Credentials, error) {
+func AllCredentials(namespace, secret string) (Credentials, error) {
 	var err error
-	// import environment variables
-	csec := os.Getenv("K8S_CRED_SECRET_NAME")
-	cns := os.Getenv("K8S_CRED_SECRET_NAMESPACE")
 	// initiate kube client
 	var kube kube.KubeCLient
 	// get the credentials
 	cred, err := GetCredentials(string(
 		kube.GetSecretData(kube.CreateClientSet(),
-			cns, csec, "authn.yaml")))
+			namespace, secret, "authn.yaml")))
 	if err != nil {
 		return cred, err
 	}

@@ -1,14 +1,9 @@
 package grafana
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"os"
-	"time"
 )
 
 type Datasource struct {
@@ -49,8 +44,7 @@ type Organizations []struct {
 }
 
 // switch to a specific grafana context
-func SwitchUserContext(org Organization) error {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func SwitchUserContext(grafanapi string, org Organization) error {
 	url := fmt.Sprintf("%v/user/using/%v", grafanapi, org.ID)
 	o, err := json.Marshal(&org)
 	if err != nil {
@@ -67,8 +61,7 @@ func SwitchUserContext(org Organization) error {
 }
 
 // get a specific grafana organization based on the org name
-func GetOrganization(orgname string) (Organization, error) {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func GetOrganization(grafanapi string, orgname string) (Organization, error) {
 	url := fmt.Sprintf("%v/orgs/name/%v", grafanapi, orgname)
 	var org Organization
 	data, err := RequestAUTH("GET", url, []byte(""))
@@ -84,8 +77,7 @@ func GetOrganization(orgname string) (Organization, error) {
 }
 
 // get all the grafana organizations
-func GetAllOrganizations() (Organizations, error) {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func GetAllOrganizations(grafanapi string) (Organizations, error) {
 	url := fmt.Sprintf("%v/orgs", grafanapi)
 	var orgs Organizations
 	data, err := RequestAUTH("GET", url, []byte(""))
@@ -101,8 +93,7 @@ func GetAllOrganizations() (Organizations, error) {
 }
 
 // create a new grafana organizations
-func CreateOrganization(org Organization) error {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func CreateOrganization(grafanapi string, org Organization) error {
 	url := fmt.Sprintf("%v/orgs", grafanapi)
 	b, err := json.Marshal(&org)
 	if err != nil {
@@ -119,8 +110,7 @@ func CreateOrganization(org Organization) error {
 }
 
 // get grafana datasource
-func GetDatasource(dsname string) (Datasource, error) {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func GetDatasource(grafanapi, dsname string) (Datasource, error) {
 	url := fmt.Sprintf("%v/datasources/name/%v", grafanapi, dsname)
 	var ds Datasource
 	data, err := RequestAUTH("GET", url, []byte(""))
@@ -136,8 +126,7 @@ func GetDatasource(dsname string) (Datasource, error) {
 }
 
 // create a new grafana datasource
-func CreateDatasource(ds Datasource) error {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func CreateDatasource(grafanapi string, ds Datasource) error {
 	url := fmt.Sprintf("%v/datasources", grafanapi)
 	b, err := json.Marshal(&ds)
 	if err != nil {
@@ -154,8 +143,7 @@ func CreateDatasource(ds Datasource) error {
 }
 
 // update existing grafana datasource
-func UpdateDatasource(ds Datasource) error {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func UpdateDatasource(grafanapi string, ds Datasource) error {
 	url := fmt.Sprintf("%v/datasources/%v", grafanapi, ds.ID)
 	b, err := json.Marshal(&ds)
 	if err != nil {
@@ -172,8 +160,7 @@ func UpdateDatasource(ds Datasource) error {
 }
 
 // delete grafana datasource
-func DeleteDatasource(ds Datasource) error {
-	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
+func DeleteDatasource(grafanapi string, ds Datasource) error {
 	url := fmt.Sprintf("%v/datasources/%v", grafanapi, ds.ID)
 	b, err := json.Marshal(&ds)
 	if err != nil {
@@ -187,41 +174,4 @@ func DeleteDatasource(ds Datasource) error {
 	}
 	log.Printf("%v\n", string(data))
 	return err
-}
-
-// function for making web requests with basic auth
-func RequestAUTH(method, url string, body []byte) ([]byte, error) {
-	var err error
-	var client *http.Client
-	var req *http.Request
-	client = &http.Client{
-		Timeout: time.Second * 10,
-	}
-
-	req, err = http.NewRequest(method, url,
-		bytes.NewBuffer(body))
-
-	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		log.Printf("%v\n", err)
-		return nil, err
-	}
-	// import grafana credentials from environment var
-	// needed for basic authentication
-	user := os.Getenv("K8S_GRAFANA_BA_USER")
-	pass := os.Getenv("K8S_GRAFANA_BA_PASSWORD")
-	req.SetBasicAuth(user, pass)
-	response, err := client.Do(req)
-	if err != nil {
-		log.Printf("%v\n", err)
-		return nil, err
-	}
-	defer response.Body.Close()
-	// read response body
-	data, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Printf("%v\n", err)
-		return data, err
-	}
-	return data, err
 }
