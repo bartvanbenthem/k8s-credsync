@@ -59,12 +59,12 @@ $ cd build/k8s-ntenant-sync
 $ docker build -t bartvanbenthem/k8s-ntenant-sync .
 
 # tag image
-$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v5
+$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v6
 $ docker image ls
 
 # login and push image to dockerhub repo
 $ docker login "docker.io"
-$ docker push bartvanbenthem/k8s-ntenant-sync:v5
+$ docker push bartvanbenthem/k8s-ntenant-sync:v6
 
 # back to project root
 $ cd ../..
@@ -83,9 +83,12 @@ $ curl --resolve ntenant:127.0.0.1 http://ntenant
 $ curl --resolve ntenant:127.0.0.1 http://ntenant/credential/sync
 $ curl --resolve ntenant:127.0.0.1 http://ntenant/grafana/sync
 $ curl --resolve ntenant:127.0.0.1 http://ntenant/ldap/sync
+# run credential sync a second time to update all orgid after 
+# the organizations have been created in grafana
+$ curl --resolve ntenant:127.0.0.1 http://ntenant/credential/sync
 
 # view sync logs
-$ kubectl logs k8s-ntenant-sync-
+$ kubectl logs k8s-ntenant-sync
 ```
 
 # TODO
