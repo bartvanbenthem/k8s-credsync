@@ -117,3 +117,4 @@ spec:
           mountPath: /loki/logs
         - name: promtail-config
           mountPath: /etc/promtail
+
