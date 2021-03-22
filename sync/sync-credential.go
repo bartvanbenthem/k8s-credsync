@@ -14,7 +14,7 @@ func Credential() error {
 	tenantsec := os.Getenv("K8S_TENANT_SECRET_NAME")
 	grafanapi := os.Getenv("K8S_GRAFANA_API_URL")
 	csec := os.Getenv("K8S_CRED_SECRET_NAME")
-	cns := os.Getenv("K8S_CRED_SECRET_NAME")
+	cns := os.Getenv("K8S_CRED_SECRET_NAMESPACE")
 	// Collect all current tenant credentials
 	tcreds, err := tenant.AllTenantCredentials(tenantsec)
 	if err != nil {
