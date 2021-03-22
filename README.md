@@ -93,6 +93,5 @@ $ kubectl logs k8s-ntenant-sync
 
 # TODO
 * Design and create sync function for automatic removal of Grafana organization when a tenant is removed from the cluster.
-* Design and create function for updating organization ids in the loki-ntenant-credentials after the organization has been created in grafana.
 
 
