@@ -94,5 +94,5 @@ $ kubectl logs k8s-ntenant-sync
 
 # TODO
 * Design and create sync function for automatic removal of Grafana organization when a tenant is removed from the cluster.
-
+* update an existing grafana datasource tenantid when not equal to the tenantid in the credential secret
 
