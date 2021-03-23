@@ -33,6 +33,25 @@ stringData:
             source: DD5SACCkCCfsdd4358NDD5
         - output:
             source: content
+      - job_name: kail
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: kail
+              __path__: /loki/logs/kail
+        pipeline_stages:
+        - regex:
+            expression: '^time="(?P<time>.*)" level=(?P<level>.*) msg="(?P<content>.*)" cmp=(?P<component>.*)'
+        - labels:
+            time:
+            level:
+            component:
+        - timestamp:
+            source: time
+            format: RFC3339
+        - output:
+            source: content
 ---
 apiVersion: v1
 kind: ServiceAccount

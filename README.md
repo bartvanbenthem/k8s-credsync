@@ -4,7 +4,7 @@ Multi-tenant logging solution with credential synchronization. Grafana is provis
 ![topology](/00-img/20210320-k8s-ntentant.png)
 
 ### Technical choices
-* A Promtail client per namespace is used for log streaming to Loki.
+* github.com/boz/kail is used for log streaming.
 * go-client sdk is used to interract with the kubernetes API.
 * A custom client with basic auth is used to interract with the Grafana API.
 * Environment variables are set for dynamic configuration parameters.
@@ -92,7 +92,6 @@ $ kubectl logs k8s-ntenant-sync
 ```
 
 # TODO
-* Update an existing grafana datasource tenantid != to tenantid in the credential secret
 * Design and create sync function for automatic removal of Grafana organization when a tenant is removed from the cluster.
 
 
