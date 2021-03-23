@@ -5,6 +5,7 @@ Multi-tenant logging solution with credential synchronization. Grafana is provis
 
 ### Technical choices
 * github.com/boz/kail is used for log streaming.
+* A Promtail client per namespace is used to push logs to Loki.
 * go-client sdk is used to interract with the kubernetes API.
 * A custom client with basic auth is used to interract with the Grafana API.
 * Environment variables are set for dynamic configuration parameters.
