@@ -12,8 +12,8 @@ stringData:
       url: http://loki.co-monitoring.svc.cluster.local:3100/api/prom/push
       basic_auth:
         username: team-beta-test
-        password:
-      tenant_id: DD4434353456546AAssd
+        password: 
+      tenant_id: fffA22345991lopQQ234
     scrape_configs:
       - job_name: containers
         static_configs:
@@ -29,25 +29,8 @@ stringData:
             namespace:
             pod:
             container:
-        - output:
-            source: content
-      - job_name: kail
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: kail
-              __path__: /loki/logs/kail
-        pipeline_stages:
-        - regex:
-            expression: '^time="(?P<time>.*)" level=(?P<level>.*) msg="(?P<content>.*)" cmp=(?P<component>.*)'
-        - labels:
-            time:
-            level:
-            component:
-        - timestamp:
-            source: time
-            format: RFC3339
+        - tenant:
+            source: fffA22345991lopQQ234
         - output:
             source: content
 ---

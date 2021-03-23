@@ -36,6 +36,9 @@ type TenantCredential struct {
 				Pod       interface{} `yaml:"pod"`
 				Container interface{} `yaml:"container"`
 			} `yaml:"labels,omitempty"`
+			Tenant struct {
+				Source string `yaml:"source"`
+			} `yaml:"tenant,omitempty"`
 			Output struct {
 				Source string `yaml:"source"`
 			} `yaml:"output,omitempty"`
