@@ -60,12 +60,12 @@ $ cd build/k8s-ntenant-sync
 $ docker build -t bartvanbenthem/k8s-ntenant-sync .
 
 # tag image
-$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v6
+$ docker tag bartvanbenthem/k8s-ntenant-sync:latest bartvanbenthem/k8s-ntenant-sync:v7
 $ docker image ls
 
 # login and push image to dockerhub repo
 $ docker login "docker.io"
-$ docker push bartvanbenthem/k8s-ntenant-sync:v6
+$ docker push bartvanbenthem/k8s-ntenant-sync:v7
 
 # back to project root
 $ cd ../..
@@ -94,5 +94,4 @@ $ kubectl logs k8s-ntenant-sync
 
 # TODO
 * Design and create sync function for automatic removal of Grafana organization when a tenant is removed from the cluster.
-* update an existing grafana datasource tenantid when not equal to the tenantid in the credential secret
 

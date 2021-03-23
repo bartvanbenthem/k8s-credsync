@@ -64,6 +64,8 @@ func Grafana() error {
 			log.Printf("Datasource \"%v\" exists\n", ds.Name)
 			log.Printf("Synchronize \"%v\" password\n", ds.Name)
 			ds.SecureJSONData.BasicAuthPassword = p.Password
+			ds.JSONData.HTTPHeaderName1 = "X-Scope-OrgID"
+			ds.SecureJSONData.HTTPHeaderValue1 = p.TenantID
 			// update existing datasource 'ds' in the current context
 			err = grafana.UpdateDatasource(grafanapi, ds)
 			if err != nil {

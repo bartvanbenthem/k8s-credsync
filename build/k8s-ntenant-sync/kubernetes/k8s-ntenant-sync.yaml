@@ -61,7 +61,7 @@ spec:
       serviceAccountName: k8s-ntenant-sa
       containers:
       - name: k8s-ntenant-sync
-        image: bartvanbenthem/k8s-ntenant-sync:v6 
+        image: bartvanbenthem/k8s-ntenant-sync:v7 
         env:
           - name: K8S_GRAFANA_BA_USER
             valueFrom:
