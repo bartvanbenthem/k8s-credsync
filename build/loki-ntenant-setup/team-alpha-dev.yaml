@@ -30,7 +30,7 @@ stringData:
             pod:
             container:
         - tenant:
-            source: 9995656AAAdf234235cc
+            source: DD44353q56546AAssd
         - output:
             source: content
       - job_name: kail
